@@ -3,12 +3,14 @@
 
     <string name="title_scpi">IISuite - SCPI</string>
     <string name="title_simulator">IISuite - Simulator</string>
+    <string name="title_settings">IISuite - Settings</string>
     <string name="title_instrument_settings">IISuite - Instrument Settings</string>
     <string name="title_server_settings">IISuite - Server Settings</string>
     <string name="title_local_settings">IISuite - Local Settings</string>
     <string name="title_log">IISuite - Log</string>
     <string name="tab_title_scpi">SCPI</string>
     <string name="tab_title_simulator">Simulator</string>
+    <string name="tab_title_settings">Settings</string>
     <string name="tab_title_instrument_settings">Instrument Settings</string>
     <string name="tab_title_server_settings">Server Settings</string>
     <string name="tab_title_local_settings">Local Settings</string>
