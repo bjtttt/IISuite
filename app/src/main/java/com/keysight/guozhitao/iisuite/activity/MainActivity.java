@@ -17,22 +17,22 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 
 import com.keysight.guozhitao.iisuite.R;
-import com.keysight.guozhitao.iisuite.activity.settings.InstrumentSettingsFragment;
-import com.keysight.guozhitao.iisuite.activity.settings.ServerSettingsFragment;
-import com.keysight.guozhitao.iisuite.activity.settings.LocalSettingsFragment;
+import com.keysight.guozhitao.iisuite.activity.settings.SettingsFragment;
 
-class MainActivity
+public class MainActivity
         extends
         ActionBarActivity
         implements
         NavigationDrawerFragment.NavigationDrawerCallbacks,
         SCPIFragment.OnFragmentInteractionListener,
         SimulatorFragment.OnFragmentInteractionListener,
+        /*
         InstrumentSettingsFragment.OnFragmentInteractionListener,
         ServerSettingsFragment.OnFragmentInteractionListener,
         LocalSettingsFragment.OnFragmentInteractionListener,
-        LogFragment.OnFragmentInteractionListener,
-        SettingsFragment.OnFragmentInteractionListener {
+        */
+        SettingsFragment.OnFragmentInteractionListener,
+        LogFragment.OnFragmentInteractionListener {
     public final int MENU_ITEM_CONNECT_INSTRUMENT = 0;
     public final int MENU_ITEM_DISCONNECT_INSTRUMENT = 1;
     public final int MENU_ITEM_CONNECT_SERVER = 2;
@@ -42,18 +42,22 @@ class MainActivity
     public final int FRAGMENT_SCPI = 0;
     public final int FRAGMENT_SIMULATOR = 1;
     public final int FRAGMENT_SETTINGS = 2;
+    /*
     public final int FRAGMENT_INSTRUMENT_SETTINGS = 3;
     public final int FRAGMENT_SERVER_SETTINGS = 4;
     public final int FRAGMENT_LOCAL_SETTINGS = 5;
-    public final int FRAGMENT_LOG = 6;
+    */
+    public final int FRAGMENT_LOG = 3;
 
     public final int TAB_SCPI = 1;
     public final int TAB_SIMULATOR = 2;
     public final int TAB_SETTINGS = 3;
+    /*
     public final int TAB_INSTRUMENT_SETTINGS = 4;
     public final int TAB_SERVER_SETTINGS = 5;
     public final int TAB_LOCAL_SETTINGS = 6;
-    public final int TAB_LOG = 7;
+    */
+    public final int TAB_LOG = 4;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -113,6 +117,7 @@ class MainActivity
                         .replace(R.id.container, SettingsFragment.newInstance("", ""))
                         .commit();
                 break;
+            /*
             case FRAGMENT_INSTRUMENT_SETTINGS:
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, InstrumentSettingsFragment.newInstance("", ""))
@@ -128,6 +133,7 @@ class MainActivity
                         .replace(R.id.container, LocalSettingsFragment.newInstance("", ""))
                         .commit();
                 break;
+            */
             case FRAGMENT_LOG:
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, LogFragment.newInstance("", ""))
@@ -149,6 +155,7 @@ class MainActivity
             case TAB_SETTINGS:
                 mTitle = getString(R.string.title_settings);
                 break;
+            /*
             case TAB_INSTRUMENT_SETTINGS:
                 mTitle = getString(R.string.title_instrument_settings);
                 break;
@@ -158,6 +165,7 @@ class MainActivity
             case TAB_LOCAL_SETTINGS:
                 mTitle = getString(R.string.title_local_settings);
                 break;
+            */
             case TAB_LOG:
                 mTitle = getString(R.string.title_log);
                 break;
@@ -179,6 +187,7 @@ class MainActivity
             case TAB_SETTINGS:
                 actionBar.setTitle(R.string.title_settings);
                 break;
+            /*
             case TAB_INSTRUMENT_SETTINGS:
                 actionBar.setTitle(R.string.title_instrument_settings);
                 break;
@@ -188,6 +197,7 @@ class MainActivity
             case TAB_LOCAL_SETTINGS:
                 actionBar.setTitle(R.string.title_local_settings);
                 break;
+            */
             case TAB_LOG:
                 actionBar.setTitle(R.string.title_log);
                 break;
@@ -281,6 +291,7 @@ class MainActivity
 
         return super.onOptionsItemSelected(item);
     }
+
 
     public void onFragmentInteraction(Uri uri){
 
