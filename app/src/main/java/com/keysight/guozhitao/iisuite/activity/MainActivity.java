@@ -42,21 +42,11 @@ public class MainActivity
     public final int FRAGMENT_SCPI = 0;
     public final int FRAGMENT_SIMULATOR = 1;
     public final int FRAGMENT_SETTINGS = 2;
-    /*
-    public final int FRAGMENT_INSTRUMENT_SETTINGS = 3;
-    public final int FRAGMENT_SERVER_SETTINGS = 4;
-    public final int FRAGMENT_LOCAL_SETTINGS = 5;
-    */
     public final int FRAGMENT_LOG = 3;
 
     public final int TAB_SCPI = 1;
     public final int TAB_SIMULATOR = 2;
     public final int TAB_SETTINGS = 3;
-    /*
-    public final int TAB_INSTRUMENT_SETTINGS = 4;
-    public final int TAB_SERVER_SETTINGS = 5;
-    public final int TAB_LOCAL_SETTINGS = 6;
-    */
     public final int TAB_LOG = 4;
 
     /**
@@ -117,23 +107,6 @@ public class MainActivity
                         .replace(R.id.container, SettingsFragment.newInstance("", ""))
                         .commit();
                 break;
-            /*
-            case FRAGMENT_INSTRUMENT_SETTINGS:
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, InstrumentSettingsFragment.newInstance("", ""))
-                        .commit();
-                break;
-            case FRAGMENT_SERVER_SETTINGS:
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, ServerSettingsFragment.newInstance("", ""))
-                        .commit();
-                break;
-            case FRAGMENT_LOCAL_SETTINGS:
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, LocalSettingsFragment.newInstance("", ""))
-                        .commit();
-                break;
-            */
             case FRAGMENT_LOG:
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, LogFragment.newInstance("", ""))
@@ -155,17 +128,6 @@ public class MainActivity
             case TAB_SETTINGS:
                 mTitle = getString(R.string.title_settings);
                 break;
-            /*
-            case TAB_INSTRUMENT_SETTINGS:
-                mTitle = getString(R.string.title_instrument_settings);
-                break;
-            case TAB_SERVER_SETTINGS:
-                mTitle = getString(R.string.title_server_settings);
-                break;
-            case TAB_LOCAL_SETTINGS:
-                mTitle = getString(R.string.title_local_settings);
-                break;
-            */
             case TAB_LOG:
                 mTitle = getString(R.string.title_log);
                 break;

@@ -106,11 +106,6 @@ public class NavigationDrawerFragment extends Fragment {
                         getString(R.string.tab_title_scpi),
                         getString(R.string.tab_title_simulator),
                         getString(R.string.tab_title_settings),
-                        /*
-                        getString(R.string.tab_title_instrument_settings),
-                        getString(R.string.tab_title_server_settings),
-                        getString(R.string.tab_title_local_settings),
-                        */
                         getString(R.string.tab_title_log),
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);

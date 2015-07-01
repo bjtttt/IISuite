@@ -5,7 +5,7 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-    <TabHost
+    <FragmentTabHost
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/tabHost"
@@ -31,11 +31,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
-                    <fragment
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:id="@+id/fragment_instrument_settings"
-                        class="com.keysight.guozhitao.iisuite.activity.settings.InstrumentSettingsFragment"></fragment>
                 </LinearLayout>
 
                 <LinearLayout
@@ -51,5 +46,5 @@
                     android:orientation="vertical"></LinearLayout>
             </FrameLayout>
         </LinearLayout>
-    </TabHost>
+    </FragmentTabHost>
 </FrameLayout>

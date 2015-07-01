@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTabHost;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,8 @@ public class SettingsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private TabHost mTabHost;
+    private FragmentTabHost mTabHost;
+    private boolean createdTab = false;
 
     private OnFragmentInteractionListener mListener;
 
@@ -68,19 +70,15 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_settings, container, false);
+        //View v = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        mTabHost = (TabHost)v.findViewById(R.id.tabHost);
-        mTabHost.setup();
-        TabHost.TabSpec instrumentTab = mTabHost.newTabSpec("tab1");
-        instrumentTab.setIndicator("Instrument");
-        //View vTab1 = v.findViewById(R.id.tab1);
-        instrumentTab.setContent(R.id.tab_instrument_settings);
-        mTabHost.addTab(instrumentTab);
-        mTabHost.addTab(mTabHost.newTabSpec("tab2").setIndicator("Server").setContent(R.id.tab_server_settings));
-        mTabHost.addTab(mTabHost.newTabSpec("tab3").setIndicator("Local").setContent(R.id.tab_local_settings));
+        mTabHost = new FragmentTabHost(getActivity());
+        mTabHost.setup(getActivity(), getChildFragmentManager());
+        mTabHost.addTab(mTabHost.newTabSpec("tab1").setIndicator("Instrument"), InstrumentSettingsFragment.class, null);
+        mTabHost.addTab(mTabHost.newTabSpec("tab2").setIndicator("Server"), ServerSettingsFragment.class, null);
+        mTabHost.addTab(mTabHost.newTabSpec("tab3").setIndicator("Local"), LocalSettingsFragment.class, null);
 
-        return v;
+        return mTabHost;//v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -98,6 +96,19 @@ public class SettingsFragment extends Fragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mTabHost = null;
+    }
+
+    public void onResume(){
+        if (!createdTab){
+            createdTab = true;
+            mTabHost.setup(getActivity(), getActivity().getSupportFragmentManager());
         }
     }
 
