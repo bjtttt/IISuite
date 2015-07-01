@@ -73,7 +73,7 @@ public class SettingsFragment extends Fragment {
         //View v = inflater.inflate(R.layout.fragment_settings, container, false);
 
         mTabHost = new FragmentTabHost(getActivity());
-        mTabHost.setup(getActivity(), getChildFragmentManager());
+        mTabHost.setup(getActivity(), getChildFragmentManager(), android.R.id.tabcontent);
         mTabHost.addTab(mTabHost.newTabSpec("tab1").setIndicator("Instrument"), InstrumentSettingsFragment.class, null);
         mTabHost.addTab(mTabHost.newTabSpec("tab2").setIndicator("Server"), ServerSettingsFragment.class, null);
         mTabHost.addTab(mTabHost.newTabSpec("tab3").setIndicator("Local"), LocalSettingsFragment.class, null);
@@ -100,15 +100,25 @@ public class SettingsFragment extends Fragment {
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (!createdTab) {
+            createdTab = true;
+            mTabHost.setup(getActivity(), getChildFragmentManager(), android.R.id.tabcontent);//getActivity().getSupportFragmentManager());
+        }
+    }
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         mTabHost = null;
     }
 
+    @Override
     public void onResume(){
+        super.onResume();
         if (!createdTab){
             createdTab = true;
-            mTabHost.setup(getActivity(), getActivity().getSupportFragmentManager());
+            mTabHost.setup(getActivity(), getChildFragmentManager(), android.R.id.tabcontent);//, getActivity().getSupportFragmentManager());
         }
     }
 

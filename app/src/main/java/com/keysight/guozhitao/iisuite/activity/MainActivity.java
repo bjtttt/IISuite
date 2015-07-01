@@ -17,6 +17,9 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 
 import com.keysight.guozhitao.iisuite.R;
+import com.keysight.guozhitao.iisuite.activity.settings.InstrumentSettingsFragment;
+import com.keysight.guozhitao.iisuite.activity.settings.ServerSettingsFragment;
+import com.keysight.guozhitao.iisuite.activity.settings.LocalSettingsFragment;
 import com.keysight.guozhitao.iisuite.activity.settings.SettingsFragment;
 
 public class MainActivity
@@ -26,11 +29,9 @@ public class MainActivity
         NavigationDrawerFragment.NavigationDrawerCallbacks,
         SCPIFragment.OnFragmentInteractionListener,
         SimulatorFragment.OnFragmentInteractionListener,
-        /*
         InstrumentSettingsFragment.OnFragmentInteractionListener,
         ServerSettingsFragment.OnFragmentInteractionListener,
         LocalSettingsFragment.OnFragmentInteractionListener,
-        */
         SettingsFragment.OnFragmentInteractionListener,
         LogFragment.OnFragmentInteractionListener {
     public final int MENU_ITEM_CONNECT_INSTRUMENT = 0;
