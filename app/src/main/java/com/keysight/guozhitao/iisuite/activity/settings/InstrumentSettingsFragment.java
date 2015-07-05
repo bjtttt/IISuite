@@ -1,12 +1,16 @@
 package com.keysight.guozhitao.iisuite.activity.settings;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.keysight.guozhitao.iisuite.R;
 
@@ -64,10 +68,37 @@ public class InstrumentSettingsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_instrument_settings, container, false);
+        View v = inflater.inflate(R.layout.fragment_instrument_settings, container, false);
+        Button btnAdd = (Button)v.findViewById(R.id.btn_add_instrument);
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LinearLayout ll = (LinearLayout)getActivity().getLayoutInflater().inflate(R.layout.dialog_input_intrument, container, false);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity().getBaseContext());
+                builder.setIcon(R.drawable.question);
+                builder.setTitle(getString(R.string.input_instrument));
+                builder.setView(ll);
+                builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                AlertDialog ad = builder.create();
+                ad.show();
+            }
+        });
+
+        return v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

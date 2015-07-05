@@ -31,7 +31,7 @@ public class SettingsFragment extends Fragment {
     private String mParam2;
 
     private FragmentTabHost mTabHost;
-    private boolean createdTab = false;
+    //private boolean createdTab = false;
 
     private OnFragmentInteractionListener mListener;
 
@@ -73,10 +73,10 @@ public class SettingsFragment extends Fragment {
         //View v = inflater.inflate(R.layout.fragment_settings, container, false);
 
         mTabHost = new FragmentTabHost(getActivity());
-        mTabHost.setup(getActivity(), getChildFragmentManager(), android.R.id.tabcontent);
-        mTabHost.addTab(mTabHost.newTabSpec("tab1").setIndicator("Instrument"), InstrumentSettingsFragment.class, null);
-        mTabHost.addTab(mTabHost.newTabSpec("tab2").setIndicator("Server"), ServerSettingsFragment.class, null);
-        mTabHost.addTab(mTabHost.newTabSpec("tab3").setIndicator("Local"), LocalSettingsFragment.class, null);
+        mTabHost.setup(getActivity(), getChildFragmentManager(), R.id.realcontent);
+        mTabHost.addTab(mTabHost.newTabSpec("tabInstrument").setIndicator("Instrument"), InstrumentSettingsFragment.class, null);
+        mTabHost.addTab(mTabHost.newTabSpec("tabServer").setIndicator("Server"), ServerSettingsFragment.class, null);
+        mTabHost.addTab(mTabHost.newTabSpec("tabLocal").setIndicator("Local"), LocalSettingsFragment.class, null);
 
         return mTabHost;//v;
     }
@@ -102,11 +102,14 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        /*
         if (!createdTab) {
             createdTab = true;
-            mTabHost.setup(getActivity(), getChildFragmentManager(), android.R.id.tabcontent);//getActivity().getSupportFragmentManager());
+            mTabHost.setup(getActivity(), getActivity().getSupportFragmentManager());//getChildFragmentManager(), android.R.id.tabcontent);//getActivity().getSupportFragmentManager());
         }
+        */
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -116,10 +119,12 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
+        /*
         if (!createdTab){
             createdTab = true;
-            mTabHost.setup(getActivity(), getChildFragmentManager(), android.R.id.tabcontent);//, getActivity().getSupportFragmentManager());
+            //mTabHost.setup(getActivity(), getChildFragmentManager(), R.id.realcontent);//getActivity().getSupportFragmentManager());
         }
+        */
     }
 
     @Override
