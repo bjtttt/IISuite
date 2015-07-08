@@ -77,7 +77,7 @@ public class InstrumentSettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 LinearLayout ll = (LinearLayout)getActivity().getLayoutInflater().inflate(R.layout.dialog_input_intrument, container, false);
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity().getBaseContext());
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setIcon(R.drawable.question);
                 builder.setTitle(getString(R.string.input_instrument));
                 builder.setView(ll);
