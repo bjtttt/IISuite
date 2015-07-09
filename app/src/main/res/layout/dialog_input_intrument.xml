@@ -12,7 +12,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Connection"
+            android:text="@string/connection"
             android:id="@+id/txtv_conn_string" />
 
         <EditText
@@ -29,13 +29,25 @@
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Auto *IDN?"
+            android:text="@string/idn"
             android:id="@+id/chb_idn" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Auto SCPI Tree"
+            android:text="@string/scpi_tree"
             android:id="@+id/chb_scpi" />
-    </LinearLayout>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/connected"
+            android:id="@+id/chb_conn" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/locked"
+            android:id="@+id/chb_lock" />
+        </LinearLayout>
 </LinearLayout>

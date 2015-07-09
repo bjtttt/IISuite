@@ -483,8 +483,14 @@
     <string name="delete">Delete</string>
     <string name="modify">Modify</string>
     <string name="synchronize">Synchronize</string>
+    <string name="sync">Sync</string>
     <string name="input_instrument">Input Instrument</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="idn">*IDN?</string>
+    <string name="scpi_tree">SCPI Tree</string>
+    <string name="connected">Connected</string>
+    <string name="locked">Locked</string>
+    <string name="connection">Connection</string>
 
 </resources>

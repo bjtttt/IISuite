@@ -3,6 +3,7 @@ package com.keysight.guozhitao.iisuite.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -21,6 +22,11 @@ import com.keysight.guozhitao.iisuite.activity.settings.InstrumentSettingsFragme
 import com.keysight.guozhitao.iisuite.activity.settings.ServerSettingsFragment;
 import com.keysight.guozhitao.iisuite.activity.settings.LocalSettingsFragment;
 import com.keysight.guozhitao.iisuite.activity.settings.SettingsFragment;
+import com.keysight.guozhitao.iisuite.helper.DBService;
+import com.keysight.guozhitao.iisuite.helper.InstrumentInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity
         extends
@@ -50,6 +56,21 @@ public class MainActivity
     public final int TAB_SETTINGS = 3;
     public final int TAB_LOG = 4;
 
+    public String[] mInstrDBColNames = new String[] {
+            "id",
+            "connection",
+            "idn",
+            "scpitree",
+            "connected",
+            "locked"
+    };
+    public final int DB_INSTR_COL_ID = 0;
+    public final int DB_INSTR_COL_CONNECTION = 1;
+    public final int DB_INSTR_COL_IDN = 2;
+    public final int DB_INSTR_COL_SCPI_TREE = 3;
+    public final int DB_INSTR_COL_CONNECTED = 4;
+    public final int DB_INSTR_COL_LOCKED = 5;
+
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -64,9 +85,27 @@ public class MainActivity
     private boolean mInstrumentConnected = false;
     private boolean mServerConnected = false;
 
+    private ArrayList<InstrumentInfo> mInstrInfoList = new ArrayList<InstrumentInfo>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        DBService dbs = new DBService(this);
+        Cursor c = dbs.query("SELECT * FROM iis_instr", null);
+        c.moveToFirst();
+        while (c.isAfterLast() == false)
+        {
+            InstrumentInfo ii = new InstrumentInfo();
+            ii.setConnection(c.getString(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_CONNECTION])));
+            ii.setIDN(c.getInt(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_IDN])) == 1);
+            ii.setSCPI(c.getInt(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_SCPI_TREE])) == 1);
+            ii.setConnected(c.getInt(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_CONNECTED])) == 1);
+            ii.setLocked(c.getInt(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_LOCKED])) == 1);
+            mInstrInfoList.add(ii);
+
+            c.moveToNext();
+        }
         setContentView(R.layout.activity_main);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
@@ -150,17 +189,6 @@ public class MainActivity
             case TAB_SETTINGS:
                 actionBar.setTitle(R.string.title_settings);
                 break;
-            /*
-            case TAB_INSTRUMENT_SETTINGS:
-                actionBar.setTitle(R.string.title_instrument_settings);
-                break;
-            case TAB_SERVER_SETTINGS:
-                actionBar.setTitle(R.string.title_server_settings);
-                break;
-            case TAB_LOCAL_SETTINGS:
-                actionBar.setTitle(R.string.title_local_settings);
-                break;
-            */
             case TAB_LOG:
                 actionBar.setTitle(R.string.title_log);
                 break;
