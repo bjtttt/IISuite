@@ -11,8 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 
 import com.keysight.guozhitao.iisuite.R;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 //import android.app.Fragment;
 
@@ -78,7 +83,7 @@ public class InstrumentSettingsFragment extends Fragment {
             public void onClick(View v) {
                 LinearLayout ll = (LinearLayout)getActivity().getLayoutInflater().inflate(R.layout.dialog_input_intrument, container, false);
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setIcon(R.drawable.question);
+                //builder.setIcon(R.drawable.question);
                 builder.setTitle(getString(R.string.input_instrument));
                 builder.setView(ll);
                 builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
@@ -97,6 +102,22 @@ public class InstrumentSettingsFragment extends Fragment {
                 ad.show();
             }
         });
+
+        ListView lv = (ListView)v.findViewById(R.id.instrument_listview);
+        ArrayList<HashMap<String, String>> instrumentList = new ArrayList<HashMap<String, String>>();
+        for(int i=0;i<30;i++)
+        {
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put("ItemTitle", "This is Title.....");
+            map.put("ItemText", "This is text.....");
+            instrumentList.add(map);
+        }
+        SimpleAdapter sa = new SimpleAdapter(getActivity(),
+                instrumentList,
+                R.layout.instrument_listview_item_layout,
+                new String[] {"Connection String", "Connection Configuration"},
+                new int[]{R.id.instrument_connection_string, R.id.instrument_connection_configuration});
+        lv.setAdapter(sa);
 
         return v;
     }

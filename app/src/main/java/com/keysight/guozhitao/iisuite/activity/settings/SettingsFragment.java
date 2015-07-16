@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TabHost;
 
 import com.keysight.guozhitao.iisuite.R;
+import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,7 +28,7 @@ public class SettingsFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
+    private GlobalSettings mGlobalSettings;
     private String mParam2;
 
     private FragmentTabHost mTabHost;
@@ -44,10 +45,10 @@ public class SettingsFragment extends Fragment {
      * @return A new instance of fragment SettingsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static SettingsFragment newInstance(String param1, String param2) {
+    public static SettingsFragment newInstance(GlobalSettings globalSettings, String param2) {
         SettingsFragment fragment = new SettingsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
+        args.put(ARG_PARAM1, globalSettings);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;

@@ -9,7 +9,7 @@
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/instrumentListView"
+        android:id="@+id/instrument_listview"
         android:layout_weight="0.57" />
 
     <LinearLayout

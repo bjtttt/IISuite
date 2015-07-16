@@ -14,13 +14,12 @@ public class DBService extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String sql = "CREATE TABLE [iis_instr] ( " +
-                "[id] AUTOINC, " +
-                "[connection] VARCHAR(100) PRIMARY KEY, " +
-                "[idn] BOOLEAN NOT NULL DEFAULT FALSE, " +
-                "[scpitree] BOOLEAN NOT NULL DEFAULT FALSE," +
-                "[connected] BOOLEAN NOT NULL DEFAULT FALSE," +
-                "[locked] BOOLEAN NOT NULL DEFAULT FALSE";
+        String sql = "CREATE TABLE iis_instr ( " +
+                "connection VARCHAR(100) PRIMARY KEY, " +
+                "idn BOOLEAN NOT NULL DEFAULT FALSE, " +
+                "scpitree BOOLEAN NOT NULL DEFAULT FALSE," +
+                "connected BOOLEAN NOT NULL DEFAULT FALSE," +
+                "locked BOOLEAN NOT NULL DEFAULT FALSE )";
         db.execSQL(sql);
     }
 

@@ -24,6 +24,7 @@ import com.keysight.guozhitao.iisuite.activity.settings.LocalSettingsFragment;
 import com.keysight.guozhitao.iisuite.activity.settings.SettingsFragment;
 import com.keysight.guozhitao.iisuite.helper.DBService;
 import com.keysight.guozhitao.iisuite.helper.InstrumentInfo;
+import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,20 +57,19 @@ public class MainActivity
     public final int TAB_SETTINGS = 3;
     public final int TAB_LOG = 4;
 
-    public String[] mInstrDBColNames = new String[] {
-            "id",
+    public final String mInstrDBName = "iis_instr";
+    public final String[] mInstrDBColNames = new String[] {
             "connection",
             "idn",
             "scpitree",
             "connected",
             "locked"
     };
-    public final int DB_INSTR_COL_ID = 0;
-    public final int DB_INSTR_COL_CONNECTION = 1;
-    public final int DB_INSTR_COL_IDN = 2;
-    public final int DB_INSTR_COL_SCPI_TREE = 3;
-    public final int DB_INSTR_COL_CONNECTED = 4;
-    public final int DB_INSTR_COL_LOCKED = 5;
+    public final int DB_INSTR_COL_CONNECTION = 0;
+    public final int DB_INSTR_COL_IDN = 1;
+    public final int DB_INSTR_COL_SCPI_TREE = 2;
+    public final int DB_INSTR_COL_CONNECTED = 3;
+    public final int DB_INSTR_COL_LOCKED = 4;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -85,7 +85,7 @@ public class MainActivity
     private boolean mInstrumentConnected = false;
     private boolean mServerConnected = false;
 
-    private ArrayList<InstrumentInfo> mInstrInfoList = new ArrayList<InstrumentInfo>();
+    private GlobalSettings mGlobalSettings = new GlobalSettings();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,18 +94,39 @@ public class MainActivity
         DBService dbs = new DBService(this);
         Cursor c = dbs.query("SELECT * FROM iis_instr", null);
         c.moveToFirst();
-        while (c.isAfterLast() == false)
-        {
+        boolean bFindLocalShort = false;
+        boolean bFindLocalLong = false;
+        while (c.isAfterLast() == false) {
             InstrumentInfo ii = new InstrumentInfo();
             ii.setConnection(c.getString(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_CONNECTION])));
             ii.setIDN(c.getInt(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_IDN])) == 1);
             ii.setSCPI(c.getInt(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_SCPI_TREE])) == 1);
             ii.setConnected(c.getInt(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_CONNECTED])) == 1);
             ii.setLocked(c.getInt(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_LOCKED])) == 1);
-            mInstrInfoList.add(ii);
+            mGlobalSettings.getInstrumentInfoList().add(ii);
+
+            if(ii.getConnection().trim().compareToIgnoreCase("TCPIP0::localhost::INSTR") == 0)
+                bFindLocalShort = true;
+            if(ii.getConnection().trim().compareToIgnoreCase("TCPIP0::localhost::inst0::INSTR") == 0)
+                bFindLocalLong = true;
 
             c.moveToNext();
         }
+        if(bFindLocalShort == false) {
+            InstrumentInfo ii = new InstrumentInfo();
+            ii.setConnection("TCPIP0::localhost::INSTR");
+            ii.setConnected(true);
+            mGlobalSettings.getInstrumentInfoList().add(0, ii);
+            dbs.querySet("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::INSTR', 0, 0, 1, 0 )", null);
+        }
+        if(bFindLocalLong == false) {
+            InstrumentInfo ii = new InstrumentInfo();
+            ii.setConnection("TCPIP0::localhost::inst0::INSTR");
+            ii.setConnected(true);
+            mGlobalSettings.getInstrumentInfoList().add(0, ii);
+            dbs.querySet("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::inst0::INSTR', 0, 0, 1, 0 )", null);
+        }
+
         setContentView(R.layout.activity_main);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
@@ -263,7 +284,8 @@ public class MainActivity
             return true;
         } else if(id == R.id.action_exit) {
             AlertDialog.Builder ab = new AlertDialog.Builder(this);
-            ab.setTitle(R.string.dialog_exit).setIcon(R.drawable.question).setMessage((R.string.dialog_exit_msg))
+            //ab.setTitle(R.string.dialog_exit).setIcon(R.drawable.question).setMessage((R.string.dialog_exit_msg))
+            ab.setTitle(R.string.dialog_exit).setMessage((R.string.dialog_exit_msg))
                     .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
