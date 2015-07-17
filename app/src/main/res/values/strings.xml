@@ -20,6 +20,8 @@
     <string name="dialog_cancel">Cancel</string>
     <string name="dialog_exit">Exit</string>
     <string name="dialog_exit_msg">Are you sure to exit?</string>
+    <string name="dialog_delete_instrument">Delete</string>
+    <string name="dialog_delete_instrument_msg">Are you sure to delete this instrument?</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

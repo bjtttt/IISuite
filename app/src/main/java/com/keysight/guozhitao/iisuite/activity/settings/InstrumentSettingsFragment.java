@@ -17,6 +17,7 @@ import android.widget.SimpleAdapter;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
+import android.view.MenuItem;
 
 import com.keysight.guozhitao.iisuite.R;
 import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
@@ -45,6 +46,13 @@ public class InstrumentSettingsFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private GlobalSettings mGlobalSettings;
     private String mParam2;
+
+    private String[] mContextmenuItems = new String[] {
+            "Modify",
+            "Delete"
+    };
+
+    private SimpleAdapter mSimpleAdapter;
 
     private OnFragmentInteractionListener mListener;
 
@@ -120,12 +128,12 @@ public class InstrumentSettingsFragment extends Fragment {
             map.put("Connection Configuration", instrumentInfoList.get(i).getInstrumentConfiguration());
             instrumentList.add(map);
         }
-        SimpleAdapter sa = new SimpleAdapter(getActivity(),
+        mSimpleAdapter = new SimpleAdapter(getActivity(),
                 instrumentList,
                 R.layout.instrument_listview_item_layout,
                 new String[]{"Connection String", "Connection Configuration"},
                 new int[]{R.id.instrument_connection_string, R.id.instrument_connection_configuration});
-        lv.setAdapter(sa);
+        lv.setAdapter(mSimpleAdapter);
         registerForContextMenu(lv);
 
         return v;
@@ -136,16 +144,47 @@ public class InstrumentSettingsFragment extends Fragment {
         super.onCreateContextMenu(menu, v, menuInfo);
 
         if (v.getId() == R.id.instrument_listview) {
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
             menu.setHeaderTitle(mGlobalSettings.getInstrumentInfoList().get(info.position).getConnection());
-            String[] menuItems = new String[] {
-                    "Modify",
-                    "Delete"
-            };
-            for (int i = 0; i<menuItems.length; i++) {
-                menu.add(Menu.NONE, i, i, menuItems[i]);
+            for (int i = 0; i < mContextmenuItems.length; i++) {
+                menu.add(Menu.NONE, i, i, mContextmenuItems[i]);
             }
         }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        boolean bSuper = super.onContextItemSelected(item);
+
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        final int mitemIndex = item.getItemId();
+
+        switch(mitemIndex) {
+            default:
+                break;
+            case 0:
+                break;
+            case 1:
+                AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+                ab.setTitle(mContextmenuItems[mitemIndex]).setMessage((R.string.dialog_delete_instrument_msg))
+                        .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mGlobalSettings.getInstrumentInfoList().remove(info.position);
+                                mSimpleAdapter.notifyDataSetChanged();
+                            }
+                        })
+                        .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Do nothing here
+                            }
+                        })
+                        .create().show();
+                break;
+        }
+
+        return true && bSuper;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
