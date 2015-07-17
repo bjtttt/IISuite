@@ -2,6 +2,9 @@ package com.keysight.guozhitao.iisuite.activity.settings;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -48,8 +51,10 @@ public class InstrumentSettingsFragment extends Fragment {
     private String mParam2;
 
     private String[] mContextmenuItems = new String[] {
+            "Copy",
             "Modify",
-            "Delete"
+            "Delete",
+            "Delete All",
     };
 
     private SimpleAdapter mSimpleAdapter;
@@ -161,10 +166,17 @@ public class InstrumentSettingsFragment extends Fragment {
 
         switch(mitemIndex) {
             default:
+            case 0: {
+                ClipboardManager clipboard = (android.content.ClipboardManager)getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = android.content.ClipData.newPlainText("Clip", CopyText);
+                clipboard.setPrimaryClip(clip);
+            }
                 break;
-            case 0:
+            case 1: {
+
+            }
                 break;
-            case 1:
+            case 2: {
                 AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
                 ab.setTitle(mContextmenuItems[mitemIndex]).setMessage((R.string.dialog_delete_instrument_msg))
                         .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
@@ -181,6 +193,26 @@ public class InstrumentSettingsFragment extends Fragment {
                             }
                         })
                         .create().show();
+            }
+                break;
+            case 3: {
+                AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+                ab.setTitle(mContextmenuItems[mitemIndex]).setMessage((R.string.dialog_delete_all_instrument_msg))
+                        .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mGlobalSettings.getInstrumentInfoList().clear();
+                                mSimpleAdapter.notifyDataSetChanged();
+                            }
+                        })
+                        .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Do nothing here
+                            }
+                        })
+                        .create().show();
+            }
                 break;
         }
 
