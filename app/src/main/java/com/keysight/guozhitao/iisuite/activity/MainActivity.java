@@ -92,7 +92,7 @@ public class MainActivity
         super.onCreate(savedInstanceState);
 
         DBService dbs = new DBService(this);
-        Cursor c = dbs.query("SELECT * FROM iis_instr", null);
+        Cursor c = dbs.query("SELECT * FROM iis_instr ORDER BY connection", null);
         c.moveToFirst();
         boolean bFindLocalShort = false;
         boolean bFindLocalLong = false;

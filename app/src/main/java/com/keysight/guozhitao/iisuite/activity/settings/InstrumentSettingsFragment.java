@@ -7,12 +7,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AdapterView;
 
 import com.keysight.guozhitao.iisuite.R;
 import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
@@ -122,8 +126,26 @@ public class InstrumentSettingsFragment extends Fragment {
                 new String[]{"Connection String", "Connection Configuration"},
                 new int[]{R.id.instrument_connection_string, R.id.instrument_connection_configuration});
         lv.setAdapter(sa);
+        registerForContextMenu(lv);
 
         return v;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        if (v.getId() == R.id.instrument_listview) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+            menu.setHeaderTitle(mGlobalSettings.getInstrumentInfoList().get(info.position).getConnection());
+            String[] menuItems = new String[] {
+                    "Modify",
+                    "Delete"
+            };
+            for (int i = 0; i<menuItems.length; i++) {
+                menu.add(Menu.NONE, i, i, menuItems[i]);
+            }
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
