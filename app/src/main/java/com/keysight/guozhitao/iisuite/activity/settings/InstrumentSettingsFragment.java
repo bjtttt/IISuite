@@ -15,7 +15,10 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import com.keysight.guozhitao.iisuite.R;
+import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
+import com.keysight.guozhitao.iisuite.helper.InstrumentInfo;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -36,7 +39,7 @@ public class InstrumentSettingsFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
+    private GlobalSettings mGlobalSettings;
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
@@ -45,15 +48,15 @@ public class InstrumentSettingsFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
+     * @param globalSettings Parameter 1.
      * @param param2 Parameter 2.
      * @return A new instance of fragment InstrumentSettingsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static InstrumentSettingsFragment newInstance(String param1, String param2) {
+    public static InstrumentSettingsFragment newInstance(GlobalSettings globalSettings, String param2) {
         InstrumentSettingsFragment fragment = new InstrumentSettingsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
+        args.putSerializable(ARG_PARAM1, globalSettings);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
@@ -67,7 +70,7 @@ public class InstrumentSettingsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
+            mGlobalSettings = (GlobalSettings)getArguments().getSerializable(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
@@ -77,11 +80,11 @@ public class InstrumentSettingsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_instrument_settings, container, false);
-        Button btnAdd = (Button)v.findViewById(R.id.btn_add_instrument);
+        Button btnAdd = (Button) v.findViewById(R.id.btn_add_instrument);
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LinearLayout ll = (LinearLayout)getActivity().getLayoutInflater().inflate(R.layout.dialog_input_intrument, container, false);
+                LinearLayout ll = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.dialog_input_intrument, container, false);
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 //builder.setIcon(R.drawable.question);
                 builder.setTitle(getString(R.string.input_instrument));
@@ -103,19 +106,20 @@ public class InstrumentSettingsFragment extends Fragment {
             }
         });
 
-        ListView lv = (ListView)v.findViewById(R.id.instrument_listview);
+        ListView lv = (ListView) v.findViewById(R.id.instrument_listview);
         ArrayList<HashMap<String, String>> instrumentList = new ArrayList<HashMap<String, String>>();
-        for(int i=0;i<30;i++)
-        {
+        ArrayList<InstrumentInfo> instrumentInfoList = mGlobalSettings.getInstrumentInfoList();
+        int instrumentInfoListSize = instrumentInfoList.size();
+        for (int i = 0; i < instrumentInfoListSize; i++) {
             HashMap<String, String> map = new HashMap<String, String>();
-            map.put("ItemTitle", "This is Title.....");
-            map.put("ItemText", "This is text.....");
+            map.put("Connection String", instrumentInfoList.get(i).getConnection());
+            map.put("Connection Configuration", instrumentInfoList.get(i).getInstrumentConfiguration());
             instrumentList.add(map);
         }
         SimpleAdapter sa = new SimpleAdapter(getActivity(),
                 instrumentList,
                 R.layout.instrument_listview_item_layout,
-                new String[] {"Connection String", "Connection Configuration"},
+                new String[]{"Connection String", "Connection Configuration"},
                 new int[]{R.id.instrument_connection_string, R.id.instrument_connection_configuration});
         lv.setAdapter(sa);
 

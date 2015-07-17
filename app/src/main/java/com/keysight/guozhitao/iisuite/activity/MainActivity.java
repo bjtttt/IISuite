@@ -165,7 +165,7 @@ public class MainActivity
                 break;
             case FRAGMENT_SETTINGS:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, SettingsFragment.newInstance("", ""))
+                        .replace(R.id.container, SettingsFragment.newInstance(mGlobalSettings, ""))
                         .commit();
                 break;
             case FRAGMENT_LOG:

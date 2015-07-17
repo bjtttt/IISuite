@@ -52,4 +52,14 @@ public class InstrumentInfo {
     public boolean getLocked() {
         return mLocked;
     }
+
+    public String getInstrumentConfiguration() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getConnected()? "Connected, " : "Unconnected, ");
+        sb.append(getLocked()? "Locked, " : "Unlocked, ");
+        sb.append(getLocked()? "Auto IDN, " : "None IDN, ");
+        sb.append(getLocked()? "Auto SCPI Tree" : "None SCPI Tree");
+
+        return sb.toString();
+    }
 }

@@ -40,7 +40,7 @@ public class SettingsFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
+     * @param globalSettings Parameter 1.
      * @param param2 Parameter 2.
      * @return A new instance of fragment SettingsFragment.
      */
@@ -48,7 +48,7 @@ public class SettingsFragment extends Fragment {
     public static SettingsFragment newInstance(GlobalSettings globalSettings, String param2) {
         SettingsFragment fragment = new SettingsFragment();
         Bundle args = new Bundle();
-        args.put(ARG_PARAM1, globalSettings);
+        args.putSerializable(ARG_PARAM1, globalSettings);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
@@ -62,7 +62,7 @@ public class SettingsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
+            mGlobalSettings = (GlobalSettings)getArguments().getSerializable(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
@@ -73,11 +73,15 @@ public class SettingsFragment extends Fragment {
         // Inflate the layout for this fragment
         //View v = inflater.inflate(R.layout.fragment_settings, container, false);
 
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(ARG_PARAM1, mGlobalSettings);
+        bundle.putString(ARG_PARAM2, "");
+
         mTabHost = new FragmentTabHost(getActivity());
         mTabHost.setup(getActivity(), getChildFragmentManager(), R.id.realcontent);
-        mTabHost.addTab(mTabHost.newTabSpec("tabInstrument").setIndicator("Instrument"), InstrumentSettingsFragment.class, null);
-        mTabHost.addTab(mTabHost.newTabSpec("tabServer").setIndicator("Server"), ServerSettingsFragment.class, null);
-        mTabHost.addTab(mTabHost.newTabSpec("tabLocal").setIndicator("Local"), LocalSettingsFragment.class, null);
+        mTabHost.addTab(mTabHost.newTabSpec("tabInstrument").setIndicator("Instrument"), InstrumentSettingsFragment.class, bundle);
+        mTabHost.addTab(mTabHost.newTabSpec("tabServer").setIndicator("Server"), ServerSettingsFragment.class, bundle);
+        mTabHost.addTab(mTabHost.newTabSpec("tabLocal").setIndicator("Local"), LocalSettingsFragment.class, bundle);
 
         return mTabHost;//v;
     }

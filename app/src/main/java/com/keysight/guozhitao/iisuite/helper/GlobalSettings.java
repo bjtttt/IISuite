@@ -1,11 +1,12 @@
 package com.keysight.guozhitao.iisuite.helper;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by cn569363 on 7/16/2015.
  */
-public class GlobalSettings {
+public class GlobalSettings implements Serializable {
 
     private ArrayList<InstrumentInfo> mInstrInfoList = new ArrayList<InstrumentInfo>();
 
