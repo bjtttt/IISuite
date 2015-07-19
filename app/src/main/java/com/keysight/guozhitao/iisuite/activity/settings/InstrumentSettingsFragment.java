@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -123,42 +124,53 @@ public class InstrumentSettingsFragment extends Fragment {
                 //builder.setIcon(R.drawable.question);
                 builder.setTitle(getString(R.string.input_instrument));
                 builder.setView(ll);
+                final EditText edittxtConnection = (EditText) ll.findViewById(R.id.edittxt_connection);
+                final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_connected);
+                final CheckBox chkboxLocked = (CheckBox) ll.findViewById(R.id.chkbox_locked);
+                final CheckBox chkboxIDN = (CheckBox) ll.findViewById(R.id.chkbox_idn);
+                final CheckBox chkboxSCPI = (CheckBox) ll.findViewById(R.id.chkbox_scpi);
                 builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        TextView tvTitle = (TextView) activity.findViewById(R.id.txtv_connection);
-                        String sInstrument = tvTitle.getText().toString().trim();
-                        CheckBox chkboxConncted = (CheckBox) activity.findViewById(R.id.chkbox_connected);
-                        boolean bConnected = chkboxConncted.isChecked();
-                        CheckBox chkboxLocked = (CheckBox) activity.findViewById(R.id.chkbox_locked);
-                        boolean bLocked = chkboxLocked.isChecked();
-                        CheckBox chkboxIDN = (CheckBox) activity.findViewById(R.id.chkbox_idn);
-                        boolean bIDN = chkboxIDN.isChecked();
-                        CheckBox chkboxSCPI = (CheckBox) activity.findViewById(R.id.chkbox_scpi);
-                        boolean bSCPI = chkboxSCPI.isChecked();
-                        ArrayList<InstrumentInfo> instrumentInfoList = mGlobalSettings.getInstrumentInfoList();
-                        boolean bAlreadyExisted = false;
-                        for(InstrumentInfo ii : instrumentInfoList) {
-                            if(ii.getConnection().compareTo(sInstrument) == 0) {
-                                bAlreadyExisted = true;
-                                break;
-                            }
-                        }
-                        if(bAlreadyExisted == true) {
-
+                        final String sInstrument = edittxtConnection.getText().toString().trim();
+                        final boolean bConnected = chkboxConncted.isChecked();
+                        final boolean bLocked = chkboxLocked.isChecked();
+                        final boolean bIDN = chkboxIDN.isChecked();
+                        final boolean bSCPI = chkboxSCPI.isChecked();
+                        if(sInstrument.isEmpty()) {
+                            AlertDialog.Builder builderEmpty = new AlertDialog.Builder(getActivity());
+                            builderEmpty.setTitle("Add Instrument").setMessage("Cannot add empty instrument!")
+                                    .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        }
+                                    })
+                                    .create().show();
                         }
                         else {
-                            InstrumentInfo ii = new InstrumentInfo();
-                            ii.setConnection("TCPIP0::localhost::inst0::INSTR");
-                            ii.setConnected(true);
-                            instrumentInfoList.add(0, ii);
-                            mDBService.querySet("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( '" +
-                                    sInstrument +
-                                    "', " +
-                                    ", " +
-                                    ", " +
-                                    ", " +
-                                    " )", null);
+                            ArrayList<InstrumentInfo> instrumentInfoList = mGlobalSettings.getInstrumentInfoList();
+                            boolean bAlreadyExisted = false;
+                            for (InstrumentInfo ii : instrumentInfoList) {
+                                if (ii.getConnection().compareTo(sInstrument) == 0) {
+                                    bAlreadyExisted = true;
+                                    break;
+                                }
+                            }
+                            if (bAlreadyExisted == true) {
+
+                            } else {
+                                InstrumentInfo ii = new InstrumentInfo();
+                                ii.setConnection("TCPIP0::localhost::inst0::INSTR");
+                                ii.setConnected(true);
+                                instrumentInfoList.add(0, ii);
+                                mDBService.querySet("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( '" +
+                                        sInstrument +
+                                        "', " +
+                                        ", " +
+                                        ", " +
+                                        ", " +
+                                        " )", null);
+                            }
                         }
                     }
                 });
