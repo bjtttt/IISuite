@@ -13,7 +13,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/connection"
-            android:id="@+id/txtv_conn_string" />
+            android:id="@+id/txtv_connection" />
 
         <EditText
             android:layout_width="match_parent"
@@ -30,24 +30,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/idn"
-            android:id="@+id/chb_idn" />
+            android:id="@+id/chkbox_idn" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/scpi_tree"
-            android:id="@+id/chb_scpi" />
+            android:id="@+id/chkbox_scpi" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/connected"
-            android:id="@+id/chb_conn" />
+            android:id="@+id/chkbox_connected" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/locked"
-            android:id="@+id/chb_lock" />
+            android:id="@+id/chkbox_locked" />
         </LinearLayout>
 </LinearLayout>
