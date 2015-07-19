@@ -488,6 +488,7 @@
     <string name="synchronize">Synchronize</string>
     <string name="sync">Sync</string>
     <string name="input_instrument">Input Instrument</string>
+    <string name="modify_instrument">Modify Instrument</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="idn">*IDN?</string>

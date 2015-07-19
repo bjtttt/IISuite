@@ -76,6 +76,8 @@ public class InstrumentSettingsFragment extends Fragment {
     final String ID_TITLE = "TITLE";
     final String ID_SUBTITLE = "SUBTITLE";
 
+    private ViewGroup mViewGroup;
+
     private OnFragmentInteractionListener mListener;
 
     /**
@@ -115,6 +117,9 @@ public class InstrumentSettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        mViewGroup = container;
+
         View v = inflater.inflate(R.layout.fragment_instrument_settings, container, false);
         Button btnAdd = (Button) v.findViewById(R.id.btn_add_instrument);
         btnAdd.setOnClickListener(new View.OnClickListener() {
@@ -261,7 +266,78 @@ public class InstrumentSettingsFragment extends Fragment {
             }
                 break;
             case 1: {
+                final InstrumentInfo ii = mGlobalSettings.getInstrumentInfoList().get(info.position);
+                LinearLayout ll = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.dialog_input_intrument, mViewGroup, false);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                //builder.setIcon(R.drawable.question);
+                builder.setTitle(getString(R.string.modify_instrument));
+                builder.setView(ll);
+                final EditText edittxtConnection = (EditText) ll.findViewById(R.id.edittxt_connection);
+                final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_connected);
+                final CheckBox chkboxLocked = (CheckBox) ll.findViewById(R.id.chkbox_locked);
+                final CheckBox chkboxIDN = (CheckBox) ll.findViewById(R.id.chkbox_idn);
+                final CheckBox chkboxSCPI = (CheckBox) ll.findViewById(R.id.chkbox_scpi);
+                edittxtConnection.setText(ii.getConnection());
+                edittxtConnection.setEnabled(false);
+                chkboxConncted.setChecked(ii.getConnected());
+                chkboxLocked.setChecked(ii.getLocked());
+                chkboxIDN.setChecked(ii.getIDN());
+                chkboxSCPI.setChecked(ii.getSCPI());
+                builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final boolean bConnected = chkboxConncted.isChecked();
+                        final boolean bLocked = chkboxLocked.isChecked();
+                        final boolean bIDN = chkboxIDN.isChecked();
+                        final boolean bSCPI = chkboxSCPI.isChecked();
+                        if(bConnected != ii.getConnected() || bLocked != ii.getLocked() || bIDN != ii.getIDN() || bSCPI != ii.getSCPI()) {
+                            ii.setConnected(bConnected);
+                            ii.setLocked(bLocked);
+                            ii.setIDN(bIDN);
+                            ii.setSCPI(bSCPI);
 
+                            String sql = "UPDATE iis_instr set " +
+                                    "idn = " + (bIDN ? "1" : "0") +
+                                    ", scpitree = " + (bSCPI ? "1" : "0") +
+                                    ", connected = " + (bConnected ? "1" : "0") +
+                                    ", locked = " + (bLocked ? "1" : "0") +
+                                    " WHERE connection = '" + ii.getConnection() + "'";
+                            mDBService.execSQL(sql);
+
+                            HashMap<String, String> hmInstrument = null;
+                            for(HashMap<String, String> hm : mInstrumentArrayList) {
+                                if(hm.get(ID_TITLE).compareTo(ii.getConnection()) == 0) {
+                                    hmInstrument = hm;
+                                    break;
+                                }
+                            }
+                            if(hmInstrument != null) {
+                                hmInstrument.remove(ID_SUBTITLE);
+                                hmInstrument.put(ID_SUBTITLE, ii.getInstrumentConfiguration());
+                            }
+
+                            mLVSimpleAdapter.notifyDataSetChanged();
+                        }
+                        else {
+                            AlertDialog.Builder builderEmpty = new AlertDialog.Builder(getActivity());
+                            builderEmpty.setTitle(ii.getConnection()).setMessage("Nothing needs modification!")
+                                    .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        }
+                                    })
+                                    .create().show();
+                        }
+                    }
+                });
+                builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                AlertDialog ad = builder.create();
+                ad.show();
             }
                 break;
             case 2: {

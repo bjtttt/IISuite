@@ -16,11 +16,11 @@ public class InstrumentInfo implements Serializable {
     }
 
     public void setConnection(String s) {
-        mConnection = s;
+        mConnection = s.trim();
     }
 
     public String getConnection() {
-        return mConnection;
+        return mConnection.trim();
     }
 
     public void setIDN(boolean b) {
@@ -59,8 +59,8 @@ public class InstrumentInfo implements Serializable {
         StringBuilder sb = new StringBuilder();
         sb.append(getConnected()? "Connected, " : "Unconnected, ");
         sb.append(getLocked()? "Locked, " : "Unlocked, ");
-        sb.append(getLocked()? "Auto IDN, " : "None IDN, ");
-        sb.append(getLocked()? "Auto SCPI Tree" : "None SCPI Tree");
+        sb.append(getIDN()? "Auto IDN, " : "None IDN, ");
+        sb.append(getSCPI()? "Auto SCPI Tree" : "None SCPI Tree");
 
         return sb.toString();
     }
