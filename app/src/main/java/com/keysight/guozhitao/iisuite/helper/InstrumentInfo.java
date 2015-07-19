@@ -1,9 +1,11 @@
 package com.keysight.guozhitao.iisuite.helper;
 
+import java.io.Serializable;
+
 /**
  * Created by cn569363 on 7/9/2015.
  */
-public class InstrumentInfo {
+public class InstrumentInfo implements Serializable {
     private String mConnection;
     private boolean mIDN;
     private boolean mSCPI;

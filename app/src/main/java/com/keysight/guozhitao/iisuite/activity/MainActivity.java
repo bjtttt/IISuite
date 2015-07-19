@@ -94,7 +94,7 @@ public class MainActivity
 
         mDBService = new DBService(this);
         mGlobalSettings.setDBService(mDBService);
-        Cursor c = mDBService.query("SELECT * FROM iis_instr ORDER BY connection", null);
+        Cursor c = mDBService.rawQuery("SELECT * FROM iis_instr ORDER BY connection", null);
         c.moveToFirst();
         boolean bFindLocalShort = false;
         boolean bFindLocalLong = false;
@@ -119,14 +119,14 @@ public class MainActivity
             ii.setConnection("TCPIP0::localhost::inst0::INSTR");
             ii.setConnected(true);
             mGlobalSettings.getInstrumentInfoList().add(0, ii);
-            mDBService.querySet("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::inst0::INSTR', 0, 0, 1, 0 )", null);
+            mDBService.execSQL("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::inst0::INSTR', 0, 0, 1, 0 )");
         }
         if(bFindLocalShort == false) {
             InstrumentInfo ii = new InstrumentInfo();
             ii.setConnection("TCPIP0::localhost::INSTR");
             ii.setConnected(true);
             mGlobalSettings.getInstrumentInfoList().add(0, ii);
-            mDBService.querySet("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::INSTR', 0, 0, 1, 0 )", null);
+            mDBService.execSQL("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::INSTR', 0, 0, 1, 0 )");
         }
 
         setContentView(R.layout.activity_main);

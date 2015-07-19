@@ -14,20 +14,20 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="fill_parent"
         android:layout_gravity="top|bottom">
 
         <Button
             android:layout_width="fill_parent"
-            android:layout_height="35dp"
+            android:layout_height="40dp"
             android:background="@drawable/round_corner_button_shape"
             android:padding="5dp"
             android:text="@string/add"
             android:id="@+id/btn_add_instrument"
             android:layout_margin="2dp" />
 
-        <Button
+        <!--Button
             android:layout_width="fill_parent"
             android:layout_height="35dp"
             android:background="@drawable/round_corner_button_shape"
@@ -36,7 +36,7 @@
             android:id="@+id/btn_delete_instrument"
             android:layout_margin="2dp" />
 
-        <!--Button
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/modify"
@@ -51,7 +51,7 @@
 
             <Button
                 android:layout_width="fill_parent"
-                android:layout_height="35dp"
+                android:layout_height="40dp"
                 android:text="@string/sync"
                 android:padding="5dp"
                 android:background="@drawable/round_corner_button_shape"

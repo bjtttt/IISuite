@@ -6,6 +6,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -172,14 +173,15 @@ public class InstrumentSettingsFragment extends Fragment {
                                 ii.setLocked(bLocked);
                                 ii.setIDN(bIDN);
                                 ii.setSCPI(bSCPI);
-                                instrumentInfoList.add(0, ii);
-                                mDBService.querySet("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( '" +
+                                instrumentInfoList.add(instrumentInfoList.size(), ii);
+                                String sql = "INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( '" +
                                         sInstrument +
                                         "', " + (bIDN ? "1" : "0") +
                                         ", " + (bSCPI ? "1" : "0") +
                                         ", " + (bConnected ? "1" : "0") +
                                         ", " + (bLocked ? "1" : "0") +
-                                        " )", null);
+                                        " )";
+                                mDBService.execSQL(sql);
                                 HashMap<String, String> map = new HashMap<String, String>();
                                 map.put(ID_TITLE, ii.getConnection());
                                 map.put(ID_SUBTITLE, ii.getInstrumentConfiguration());
@@ -286,7 +288,7 @@ public class InstrumentSettingsFragment extends Fragment {
                                     mGlobalSettings.getInstrumentInfoList().remove(info.position);
                                     mLVSimpleAdapter.notifyDataSetChanged();
 
-                                    mDBService.querySet("DELETE FROM iis_instr where connection='" + ii.getConnection().trim() + "'", null);
+                                    mDBService.execSQL("DELETE FROM iis_instr where connection='" + ii.getConnection().trim() + "'");
                                 }
                             }
                         })
@@ -308,17 +310,17 @@ public class InstrumentSettingsFragment extends Fragment {
                                 ArrayList<InstrumentInfo> instrumentInfoList = mGlobalSettings.getInstrumentInfoList();
                                 instrumentInfoList.clear();
 
-                                mDBService.querySet("DELETE FROM iis_instr", null);
+                                mDBService.execSQL("DELETE FROM iis_instr");
                                 InstrumentInfo ii = new InstrumentInfo();
                                 ii.setConnection("TCPIP0::localhost::inst0::INSTR");
                                 ii.setConnected(true);
                                 instrumentInfoList.add(0, ii);
-                                mDBService.querySet("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::INSTR', 0, 0, 1, 0 )", null);
+                                mDBService.execSQL("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::INSTR', 0, 0, 1, 0 )");
                                 ii = new InstrumentInfo();
                                 ii.setConnection("TCPIP0::localhost::INSTR");
                                 ii.setConnected(true);
                                 instrumentInfoList.add(0, ii);
-                                mDBService.querySet("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::inst0::INSTR', 0, 0, 1, 0 )", null);
+                                mDBService.execSQL("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::inst0::INSTR', 0, 0, 1, 0 )");
 
                                 mInstrumentArrayList.clear();
                                 int instrumentInfoListSize = instrumentInfoList.size();

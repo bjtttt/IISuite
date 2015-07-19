@@ -5,10 +5,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.Serializable;
+
 /**
  * Created by cn569363 on 7/9/2015.
  */
-public class DBService extends SQLiteOpenHelper {
+public class DBService extends SQLiteOpenHelper implements Serializable {
     private final static int DATABASE_VERSION = 1;
     private final static String DATABASE_NAME = "iisuite.db";
 
@@ -37,7 +39,7 @@ public class DBService extends SQLiteOpenHelper {
      * @param args
      * @return
      */
-    public Cursor query(String sql, String[] args) {
+    public Cursor rawQuery(String sql, String[] args) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery(sql, args);
         return c;
@@ -46,12 +48,10 @@ public class DBService extends SQLiteOpenHelper {
     /**
      * Only for change, if change is NOT necessary, call query
      * @param sql
-     * @param args
      * @return
      */
-    public Cursor querySet(String sql, String[] args) {
+    public void execSQL(String sql) {
         SQLiteDatabase db = getWritableDatabase();
-        Cursor c = db.rawQuery(sql, args);
-        return c;
+        db.execSQL(sql);
     }
 }
