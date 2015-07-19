@@ -14,6 +14,12 @@ public class GlobalSettings implements Serializable {
         return mInstrInfoList;
     }
 
+    private ArrayList<ServerInfo> mServerInfoList = new ArrayList<ServerInfo>();
+
+    public ArrayList<ServerInfo> getServerInfoList() {
+        return mServerInfoList;
+    }
+
     private DBService mDBService;
 
     public void setDBService(DBService dbs) {

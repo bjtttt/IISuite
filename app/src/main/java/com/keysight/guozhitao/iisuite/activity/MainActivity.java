@@ -24,6 +24,7 @@ import com.keysight.guozhitao.iisuite.activity.settings.LocalSettingsFragment;
 import com.keysight.guozhitao.iisuite.activity.settings.SettingsFragment;
 import com.keysight.guozhitao.iisuite.helper.DBService;
 import com.keysight.guozhitao.iisuite.helper.InstrumentInfo;
+import com.keysight.guozhitao.iisuite.helper.ServerInfo;
 import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
 
 import java.util.ArrayList;
@@ -70,6 +71,14 @@ public class MainActivity
     public final int DB_INSTR_COL_SCPI_TREE = 2;
     public final int DB_INSTR_COL_CONNECTED = 3;
     public final int DB_INSTR_COL_LOCKED = 4;
+
+    public final String mServerDBName = "iis_server";
+    public final String[] mServerDBColNames = new String[] {
+            "server",
+            "connected"
+    };
+    public final int DB_SERVER_COL_SERVER = 0;
+    public final int DB_SERVER_COL_CONNECTED = 1;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -127,6 +136,28 @@ public class MainActivity
             ii.setConnected(true);
             mGlobalSettings.getInstrumentInfoList().add(0, ii);
             mDBService.execSQL("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::INSTR', 0, 0, 1, 0 )");
+        }
+
+        c = mDBService.rawQuery("SELECT * FROM iis_server ORDER BY server", null);
+        c.moveToFirst();
+        boolean bFindLocal = false;
+        while (c.isAfterLast() == false) {
+            ServerInfo si = new ServerInfo();
+            si.setServer(c.getString(c.getColumnIndex(mServerDBColNames[DB_SERVER_COL_SERVER])));
+            si.setConnected(c.getInt(c.getColumnIndex(mServerDBColNames[DB_SERVER_COL_CONNECTED])) == 1);
+            mGlobalSettings.getServerInfoList().add(si);
+
+            if(si.getServer().compareToIgnoreCase("localhost") == 0)
+                bFindLocal = true;
+
+            c.moveToNext();
+        }
+        if(bFindLocal == false) {
+            ServerInfo si = new ServerInfo();
+            si.setServer("localhost");
+            si.setConnected(true);
+            mGlobalSettings.getServerInfoList().add(0, si);
+            mDBService.execSQL("INSERT INTO iis_server ( server, connected ) VALUES ( 'localhost', 1 )");
         }
 
         setContentView(R.layout.activity_main);

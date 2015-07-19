@@ -23,6 +23,11 @@ public class DBService extends SQLiteOpenHelper implements Serializable {
                 "connected BOOLEAN NOT NULL DEFAULT FALSE," +
                 "locked BOOLEAN NOT NULL DEFAULT FALSE )";
         db.execSQL(sql);
+
+        sql = "CREATE TABLE iis_server ( " +
+                "server VARCHAR(100) PRIMARY KEY, " +
+                "connected BOOLEAN NOT NULL DEFAULT FALSE )";
+        db.execSQL(sql);
     }
 
     public DBService(Context c) {

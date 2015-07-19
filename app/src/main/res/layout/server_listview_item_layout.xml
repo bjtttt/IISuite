@@ -6,13 +6,13 @@
     <TextView
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
-        android:id="@+id/instrument_connection_string"
+        android:id="@+id/server_connection_string"
         android:textSize="25dip">
     </TextView>
     <TextView
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
-        android:id="@+id/instrument_connection_configuration">
+        android:id="@+id/server_connection_configuration">
     </TextView>
 
 </LinearLayout>

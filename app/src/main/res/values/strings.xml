@@ -23,6 +23,9 @@
     <string name="dialog_delete_instrument">Delete</string>
     <string name="dialog_delete_instrument_msg">Are you sure to delete this instrument?</string>
     <string name="dialog_delete_all_instrument_msg">Are you sure to delete all instruments?</string>
+    <string name="dialog_delete_server">Delete</string>
+    <string name="dialog_delete_server_msg">Are you sure to delete this server?</string>
+    <string name="dialog_delete_all_server_msg">Are you sure to delete all servers?</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -496,5 +499,8 @@
     <string name="connected">Connected</string>
     <string name="locked">Locked</string>
     <string name="connection">Connection</string>
+    <string name="server">Server</string>
+    <string name="input_server">Input Server</string>
+    <string name="modify_server">Modify Server</string>
 
 </resources>

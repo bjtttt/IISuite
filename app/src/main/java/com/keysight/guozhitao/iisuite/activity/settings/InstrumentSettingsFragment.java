@@ -59,10 +59,10 @@ public class InstrumentSettingsFragment extends Fragment {
     private String mParam2;
 
     private String[] mContextmenuItems = new String[] {
-            "Copy",
-            "Modify",
-            "Delete",
-            "Delete All",
+            "Copy Connection String",
+            "Modify Connection Configuration",
+            "Delete Instrument",
+            "Delete All Instruments",
     };
 
     private DBService mDBService;
@@ -70,9 +70,7 @@ public class InstrumentSettingsFragment extends Fragment {
     private ListView mLVInstrument;
     private SimpleAdapter mLVSimpleAdapter;
     private ArrayList<HashMap<String,String>> mInstrumentArrayList;
-    private String mCopyInstrument = "";
 
-    final String ID_OBJECT = "OBJECT";
     final String ID_TITLE = "TITLE";
     final String ID_SUBTITLE = "SUBTITLE";
 
@@ -131,7 +129,7 @@ public class InstrumentSettingsFragment extends Fragment {
                 builder.setTitle(getString(R.string.input_instrument));
                 builder.setView(ll);
                 final EditText edittxtConnection = (EditText) ll.findViewById(R.id.edittxt_connection);
-                final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_connected);
+                final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_instrument_connected);
                 final CheckBox chkboxLocked = (CheckBox) ll.findViewById(R.id.chkbox_locked);
                 final CheckBox chkboxIDN = (CheckBox) ll.findViewById(R.id.chkbox_idn);
                 final CheckBox chkboxSCPI = (CheckBox) ll.findViewById(R.id.chkbox_scpi);
@@ -260,8 +258,9 @@ public class InstrumentSettingsFragment extends Fragment {
         switch(mitemIndex) {
             default:
             case 0: {
+                final InstrumentInfo ii = mGlobalSettings.getInstrumentInfoList().get(info.position);
                 ClipboardManager clipboard = (android.content.ClipboardManager)getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = android.content.ClipData.newPlainText("Clip", mCopyInstrument);
+                ClipData clip = ClipData.newPlainText("CopyInstrument", ii.getConnection());
                 clipboard.setPrimaryClip(clip);
             }
                 break;
@@ -273,7 +272,7 @@ public class InstrumentSettingsFragment extends Fragment {
                 builder.setTitle(getString(R.string.modify_instrument));
                 builder.setView(ll);
                 final EditText edittxtConnection = (EditText) ll.findViewById(R.id.edittxt_connection);
-                final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_connected);
+                final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_instrument_connected);
                 final CheckBox chkboxLocked = (CheckBox) ll.findViewById(R.id.chkbox_locked);
                 final CheckBox chkboxIDN = (CheckBox) ll.findViewById(R.id.chkbox_idn);
                 final CheckBox chkboxSCPI = (CheckBox) ll.findViewById(R.id.chkbox_scpi);

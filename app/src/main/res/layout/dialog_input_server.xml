@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/dialog_input_instrument"
+    android:id="@+id/dialog_input_server"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -12,13 +12,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/connection"
-            android:id="@+id/txtv_connection" />
+            android:text="@string/server"
+            android:id="@+id/txtv_server" />
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/edittxt_connection" />
+            android:id="@+id/edittxt_server" />
     </LinearLayout>
 
     <LinearLayout
@@ -26,7 +26,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
 
-        <CheckBox
+        <!--CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/idn"
@@ -36,18 +36,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/scpi_tree"
-            android:id="@+id/chkbox_scpi" />
+            android:id="@+id/chkbox_scpi" /-->
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/connected"
-            android:id="@+id/chkbox_instrument_connected" />
+            android:id="@+id/chkbox_server_connected" />
 
-        <CheckBox
+        <!--CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/locked"
-            android:id="@+id/chkbox_locked" />
+            android:id="@+id/chkbox_locked" /-->
         </LinearLayout>
 </LinearLayout>
