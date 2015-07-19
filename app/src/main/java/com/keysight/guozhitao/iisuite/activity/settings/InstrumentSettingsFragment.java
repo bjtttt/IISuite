@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -21,8 +22,10 @@ import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.keysight.guozhitao.iisuite.R;
+import com.keysight.guozhitao.iisuite.helper.DBService;
 import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
 import com.keysight.guozhitao.iisuite.helper.InstrumentInfo;
 
@@ -57,7 +60,16 @@ public class InstrumentSettingsFragment extends Fragment {
             "Delete All",
     };
 
-    private SimpleAdapter mSimpleAdapter;
+    private DBService mDBService;
+
+    private ListView mLVInstrument;
+    private SimpleAdapter mLVSimpleAdapter;
+    private ArrayList<HashMap<String,String>> mInstrumentArrayList;
+    private String mCopyInstrument = "";
+
+    final String ID_OBJECT = "OBJECT";
+    final String ID_TITLE = "TITLE";
+    final String ID_SUBTITLE = "SUBTITLE";
 
     private OnFragmentInteractionListener mListener;
 
@@ -90,6 +102,8 @@ public class InstrumentSettingsFragment extends Fragment {
             mGlobalSettings = (GlobalSettings)getArguments().getSerializable(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        mDBService = mGlobalSettings.getmDBService();
     }
 
     @Override
@@ -123,23 +137,24 @@ public class InstrumentSettingsFragment extends Fragment {
             }
         });
 
-        ListView lv = (ListView) v.findViewById(R.id.instrument_listview);
-        ArrayList<HashMap<String, String>> instrumentList = new ArrayList<HashMap<String, String>>();
+        mLVInstrument = (ListView) v.findViewById(R.id.instrument_listview);
         ArrayList<InstrumentInfo> instrumentInfoList = mGlobalSettings.getInstrumentInfoList();
+        mInstrumentArrayList = new ArrayList<>();
         int instrumentInfoListSize = instrumentInfoList.size();
         for (int i = 0; i < instrumentInfoListSize; i++) {
             HashMap<String, String> map = new HashMap<String, String>();
-            map.put("Connection String", instrumentInfoList.get(i).getConnection());
-            map.put("Connection Configuration", instrumentInfoList.get(i).getInstrumentConfiguration());
-            instrumentList.add(map);
+            map.put(ID_TITLE, instrumentInfoList.get(i).getConnection());
+            map.put(ID_SUBTITLE, instrumentInfoList.get(i).getInstrumentConfiguration());
+            mInstrumentArrayList.add(map);
         }
-        mSimpleAdapter = new SimpleAdapter(getActivity(),
-                instrumentList,
+        mLVSimpleAdapter = new SimpleAdapter(
+                getActivity(),
+                mInstrumentArrayList,
                 R.layout.instrument_listview_item_layout,
-                new String[]{"Connection String", "Connection Configuration"},
-                new int[]{R.id.instrument_connection_string, R.id.instrument_connection_configuration});
-        lv.setAdapter(mSimpleAdapter);
-        registerForContextMenu(lv);
+                new String[] {ID_TITLE, ID_SUBTITLE},
+                new int[] {R.id.instrument_connection_string, R.id.instrument_connection_configuration});
+        mLVInstrument.setAdapter(mLVSimpleAdapter);
+        registerForContextMenu(mLVInstrument);
 
         return v;
     }
@@ -168,7 +183,7 @@ public class InstrumentSettingsFragment extends Fragment {
             default:
             case 0: {
                 ClipboardManager clipboard = (android.content.ClipboardManager)getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = android.content.ClipData.newPlainText("Clip", CopyText);
+                ClipData clip = android.content.ClipData.newPlainText("Clip", mCopyInstrument);
                 clipboard.setPrimaryClip(clip);
             }
                 break;
@@ -177,13 +192,31 @@ public class InstrumentSettingsFragment extends Fragment {
             }
                 break;
             case 2: {
+                InstrumentInfo ii = mGlobalSettings.getInstrumentInfoList().get(info.position);
                 AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
-                ab.setTitle(mContextmenuItems[mitemIndex]).setMessage((R.string.dialog_delete_instrument_msg))
+                ab.setTitle(ii.getConnection()).setMessage((R.string.dialog_delete_instrument_msg))
                         .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                mGlobalSettings.getInstrumentInfoList().remove(info.position);
-                                mSimpleAdapter.notifyDataSetChanged();
+                                InstrumentInfo ii = mGlobalSettings.getInstrumentInfoList().get(info.position);
+                                if(ii.getConnection().trim().compareToIgnoreCase("TCPIP0::localhost::INSTR") == 0 ||
+                                        ii.getConnection().trim().compareToIgnoreCase("TCPIP0::localhost::inst0::INSTR") == 0) {
+                                    AlertDialog.Builder abDelete = new AlertDialog.Builder(getActivity());
+                                    abDelete.setTitle(ii.getConnection()).setMessage(("The default instrument cannot be deleted!"))
+                                            .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                }
+                                            })
+                                            .create().show();
+                                }
+                                else {
+                                    mInstrumentArrayList.remove(info.position);
+                                    mGlobalSettings.getInstrumentInfoList().remove(info.position);
+                                    mLVSimpleAdapter.notifyDataSetChanged();
+
+                                    mDBService.querySet("DELETE FROM iis_instr where connection='" + ii.getConnection().trim() + "'", null);
+                                }
                             }
                         })
                         .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
@@ -201,8 +234,31 @@ public class InstrumentSettingsFragment extends Fragment {
                         .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                mGlobalSettings.getInstrumentInfoList().clear();
-                                mSimpleAdapter.notifyDataSetChanged();
+                                ArrayList<InstrumentInfo> instrumentInfoList = mGlobalSettings.getInstrumentInfoList();
+                                instrumentInfoList.clear();
+
+                                mDBService.querySet("DELETE FROM iis_instr", null);
+                                InstrumentInfo ii = new InstrumentInfo();
+                                ii.setConnection("TCPIP0::localhost::inst0::INSTR");
+                                ii.setConnected(true);
+                                instrumentInfoList.add(0, ii);
+                                mDBService.querySet("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::INSTR', 0, 0, 1, 0 )", null);
+                                ii = new InstrumentInfo();
+                                ii.setConnection("TCPIP0::localhost::INSTR");
+                                ii.setConnected(true);
+                                instrumentInfoList.add(0, ii);
+                                mDBService.querySet("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::inst0::INSTR', 0, 0, 1, 0 )", null);
+
+                                mInstrumentArrayList.clear();
+                                int instrumentInfoListSize = instrumentInfoList.size();
+                                for (int i = 0; i < instrumentInfoListSize; i++) {
+                                    HashMap<String, String> map = new HashMap<String, String>();
+                                    map.put(ID_TITLE, instrumentInfoList.get(i).getConnection());
+                                    map.put(ID_SUBTITLE, instrumentInfoList.get(i).getInstrumentConfiguration());
+                                    mInstrumentArrayList.add(map);
+                                }
+
+                                mLVSimpleAdapter.notifyDataSetChanged();
                             }
                         })
                         .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {

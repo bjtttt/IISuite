@@ -14,4 +14,13 @@ public class GlobalSettings implements Serializable {
         return mInstrInfoList;
     }
 
+    private DBService mDBService;
+
+    public void setDBService(DBService dbs) {
+        mDBService = dbs;
+    }
+
+    public DBService getmDBService() {
+        return mDBService;
+    }
 }

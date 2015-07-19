@@ -85,14 +85,16 @@ public class MainActivity
     private boolean mInstrumentConnected = false;
     private boolean mServerConnected = false;
 
+    private DBService mDBService;
     private GlobalSettings mGlobalSettings = new GlobalSettings();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DBService dbs = new DBService(this);
-        Cursor c = dbs.query("SELECT * FROM iis_instr ORDER BY connection", null);
+        mDBService = new DBService(this);
+        mGlobalSettings.setDBService(mDBService);
+        Cursor c = mDBService.query("SELECT * FROM iis_instr ORDER BY connection", null);
         c.moveToFirst();
         boolean bFindLocalShort = false;
         boolean bFindLocalLong = false;
@@ -112,19 +114,19 @@ public class MainActivity
 
             c.moveToNext();
         }
-        if(bFindLocalShort == false) {
-            InstrumentInfo ii = new InstrumentInfo();
-            ii.setConnection("TCPIP0::localhost::INSTR");
-            ii.setConnected(true);
-            mGlobalSettings.getInstrumentInfoList().add(0, ii);
-            dbs.querySet("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::INSTR', 0, 0, 1, 0 )", null);
-        }
         if(bFindLocalLong == false) {
             InstrumentInfo ii = new InstrumentInfo();
             ii.setConnection("TCPIP0::localhost::inst0::INSTR");
             ii.setConnected(true);
             mGlobalSettings.getInstrumentInfoList().add(0, ii);
-            dbs.querySet("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::inst0::INSTR', 0, 0, 1, 0 )", null);
+            mDBService.querySet("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::inst0::INSTR', 0, 0, 1, 0 )", null);
+        }
+        if(bFindLocalShort == false) {
+            InstrumentInfo ii = new InstrumentInfo();
+            ii.setConnection("TCPIP0::localhost::INSTR");
+            ii.setConnected(true);
+            mGlobalSettings.getInstrumentInfoList().add(0, ii);
+            mDBService.querySet("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::INSTR', 0, 0, 1, 0 )", null);
         }
 
         setContentView(R.layout.activity_main);
