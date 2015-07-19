@@ -157,19 +157,42 @@ public class InstrumentSettingsFragment extends Fragment {
                                 }
                             }
                             if (bAlreadyExisted == true) {
-
+                                AlertDialog.Builder builderEmpty = new AlertDialog.Builder(getActivity());
+                                builderEmpty.setTitle(sInstrument).setMessage("Cannot add duplicated instrument!")
+                                        .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                            }
+                                        })
+                                        .create().show();
                             } else {
                                 InstrumentInfo ii = new InstrumentInfo();
-                                ii.setConnection("TCPIP0::localhost::inst0::INSTR");
-                                ii.setConnected(true);
+                                ii.setConnection(sInstrument);
+                                ii.setConnected(bConnected);
+                                ii.setLocked(bLocked);
+                                ii.setIDN(bIDN);
+                                ii.setSCPI(bSCPI);
                                 instrumentInfoList.add(0, ii);
                                 mDBService.querySet("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( '" +
                                         sInstrument +
-                                        "', " +
-                                        ", " +
-                                        ", " +
-                                        ", " +
+                                        "', " + (bIDN ? "1" : "0") +
+                                        ", " + (bSCPI ? "1" : "0") +
+                                        ", " + (bConnected ? "1" : "0") +
+                                        ", " + (bLocked ? "1" : "0") +
                                         " )", null);
+                                HashMap<String, String> map = new HashMap<String, String>();
+                                map.put(ID_TITLE, ii.getConnection());
+                                map.put(ID_SUBTITLE, ii.getInstrumentConfiguration());
+                                mInstrumentArrayList.add(map);
+                                mLVSimpleAdapter.notifyDataSetChanged();
+                                AlertDialog.Builder builderEmpty = new AlertDialog.Builder(getActivity());
+                                builderEmpty.setTitle(sInstrument).setMessage("Successfully add instrument!")
+                                        .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                            }
+                                        })
+                                        .create().show();
                             }
                         }
                     }
