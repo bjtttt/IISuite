@@ -18,6 +18,7 @@ public class DBService extends SQLiteOpenHelper implements Serializable {
     public void onCreate(SQLiteDatabase db) {
         String sql = "CREATE TABLE iis_instr ( " +
                 "connection VARCHAR(100) PRIMARY KEY, " +
+                "timeout INTEGER NOT NULL DEFAULT 5, " +
                 "idn BOOLEAN NOT NULL DEFAULT FALSE, " +
                 "scpitree BOOLEAN NOT NULL DEFAULT FALSE," +
                 "connected BOOLEAN NOT NULL DEFAULT FALSE," +

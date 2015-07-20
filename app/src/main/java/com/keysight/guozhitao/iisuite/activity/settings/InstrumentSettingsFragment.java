@@ -6,6 +6,8 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,6 +28,7 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.keysight.guozhitao.iisuite.R;
 import com.keysight.guozhitao.iisuite.helper.DBService;
@@ -118,7 +121,16 @@ public class InstrumentSettingsFragment extends Fragment {
 
         mViewGroup = container;
 
-        View v = inflater.inflate(R.layout.fragment_instrument_settings, container, false);
+        View v = null;
+        //int orientation = getActivity().getRequestedOrientation();
+        //if(orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+        //    getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        v = inflater.inflate(R.layout.fragment_instrument_settings, container, false);
+        //}
+        //else {
+        //    getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //    v = inflater.inflate(R.layout.fragment_instrument_settings_vertical, container, false);
+        //}
         Button btnAdd = (Button) v.findViewById(R.id.btn_add_instrument);
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -422,6 +434,21 @@ public class InstrumentSettingsFragment extends Fragment {
 
         return true && bSuper;
     }
+
+    /*
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        int o = getActivity().getRequestedOrientation();
+        switch (o) {
+            case ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE:
+                break;
+            case ActivityInfo.SCREEN_ORIENTATION_PORTRAIT:
+                break;
+        }
+    }
+    */
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
