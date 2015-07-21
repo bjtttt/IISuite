@@ -6,11 +6,12 @@ import java.io.Serializable;
  * Created by cn569363 on 7/9/2015.
  */
 public class InstrumentInfo implements Serializable {
-    private String mConnection;
-    private boolean mIDN;
-    private boolean mSCPI;
-    private boolean mConnected;
-    private boolean mLocked;
+    private String mConnection = "";
+    private int mTimeout = 5;
+    private boolean mIDN = false;
+    private boolean mSCPI = false;
+    private boolean mConnected = false;
+    private boolean mLocked = false;
 
     public InstrumentInfo() {
     }
@@ -21,6 +22,16 @@ public class InstrumentInfo implements Serializable {
 
     public String getConnection() {
         return mConnection.trim();
+    }
+
+    public void setTimeout(int i) {
+        if(i < 5)
+            throw new IllegalArgumentException(String.format("InstrumentInfo:setTimeout(%d)", i));
+        mTimeout = i;
+    }
+
+    public int getTimeout() {
+        return mTimeout;
     }
 
     public void setIDN(boolean b) {
@@ -57,6 +68,7 @@ public class InstrumentInfo implements Serializable {
 
     public String getInstrumentConfiguration() {
         StringBuilder sb = new StringBuilder();
+        sb.append(getTimeout() + "s, ");
         sb.append(getConnected()? "Connected, " : "Unconnected, ");
         sb.append(getLocked()? "Locked, " : "Unlocked, ");
         sb.append(getIDN()? "Auto IDN, " : "None IDN, ");

@@ -131,6 +131,32 @@ public class InstrumentSettingsFragment extends Fragment {
         //    getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //    v = inflater.inflate(R.layout.fragment_instrument_settings_vertical, container, false);
         //}
+        Button btnIncrease = (Button) v.findViewById(R.id.button_increase_timeout);
+        btnIncrease.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        btnIncrease.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return true;
+            }
+        });
+        Button btnDecrease = (Button) v.findViewById(R.id.button_decrease_timeout);
+        btnDecrease.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        btnDecrease.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+            }
+        });
+
         Button btnAdd = (Button) v.findViewById(R.id.btn_add_instrument);
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,6 +167,7 @@ public class InstrumentSettingsFragment extends Fragment {
                 builder.setTitle(getString(R.string.input_instrument));
                 builder.setView(ll);
                 final EditText edittxtConnection = (EditText) ll.findViewById(R.id.edittxt_connection);
+                final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_timeout);
                 final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_instrument_connected);
                 final CheckBox chkboxLocked = (CheckBox) ll.findViewById(R.id.chkbox_locked);
                 final CheckBox chkboxIDN = (CheckBox) ll.findViewById(R.id.chkbox_idn);
@@ -149,6 +176,7 @@ public class InstrumentSettingsFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final String sInstrument = edittxtConnection.getText().toString().trim();
+                        final int iTimeout = Integer.getInteger(etxtTimeout.getText().toString());
                         final boolean bConnected = chkboxConncted.isChecked();
                         final boolean bLocked = chkboxLocked.isChecked();
                         final boolean bIDN = chkboxIDN.isChecked();
@@ -184,14 +212,16 @@ public class InstrumentSettingsFragment extends Fragment {
                             } else {
                                 InstrumentInfo ii = new InstrumentInfo();
                                 ii.setConnection(sInstrument);
+                                ii.setTimeout(iTimeout);
                                 ii.setConnected(bConnected);
                                 ii.setLocked(bLocked);
                                 ii.setIDN(bIDN);
                                 ii.setSCPI(bSCPI);
                                 instrumentInfoList.add(instrumentInfoList.size(), ii);
-                                String sql = "INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( '" +
+                                String sql = "INSERT INTO iis_instr ( connection, timeout, idn, scpitree, connected, locked ) VALUES ( '" +
                                         sInstrument +
-                                        "', " + (bIDN ? "1" : "0") +
+                                        "', " + iTimeout +
+                                        ", " + (bIDN ? "1" : "0") +
                                         ", " + (bSCPI ? "1" : "0") +
                                         ", " + (bConnected ? "1" : "0") +
                                         ", " + (bLocked ? "1" : "0") +
@@ -284,12 +314,14 @@ public class InstrumentSettingsFragment extends Fragment {
                 builder.setTitle(getString(R.string.modify_instrument));
                 builder.setView(ll);
                 final EditText edittxtConnection = (EditText) ll.findViewById(R.id.edittxt_connection);
+                final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_timeout);
                 final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_instrument_connected);
                 final CheckBox chkboxLocked = (CheckBox) ll.findViewById(R.id.chkbox_locked);
                 final CheckBox chkboxIDN = (CheckBox) ll.findViewById(R.id.chkbox_idn);
                 final CheckBox chkboxSCPI = (CheckBox) ll.findViewById(R.id.chkbox_scpi);
                 edittxtConnection.setText(ii.getConnection());
                 edittxtConnection.setEnabled(false);
+                etxtTimeout.setText(ii.getTimeout());
                 chkboxConncted.setChecked(ii.getConnected());
                 chkboxLocked.setChecked(ii.getLocked());
                 chkboxIDN.setChecked(ii.getIDN());
@@ -297,18 +329,21 @@ public class InstrumentSettingsFragment extends Fragment {
                 builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        final int iTimeout = Integer.getInteger(etxtTimeout.getText().toString());
                         final boolean bConnected = chkboxConncted.isChecked();
                         final boolean bLocked = chkboxLocked.isChecked();
                         final boolean bIDN = chkboxIDN.isChecked();
                         final boolean bSCPI = chkboxSCPI.isChecked();
-                        if(bConnected != ii.getConnected() || bLocked != ii.getLocked() || bIDN != ii.getIDN() || bSCPI != ii.getSCPI()) {
+                        if(iTimeout != ii.getTimeout() || bConnected != ii.getConnected() || bLocked != ii.getLocked() || bIDN != ii.getIDN() || bSCPI != ii.getSCPI()) {
+                            ii.setTimeout(iTimeout);
                             ii.setConnected(bConnected);
                             ii.setLocked(bLocked);
                             ii.setIDN(bIDN);
                             ii.setSCPI(bSCPI);
 
                             String sql = "UPDATE iis_instr set " +
-                                    "idn = " + (bIDN ? "1" : "0") +
+                                    "timeout = " + iTimeout +
+                                    ", idn = " + (bIDN ? "1" : "0") +
                                     ", scpitree = " + (bSCPI ? "1" : "0") +
                                     ", connected = " + (bConnected ? "1" : "0") +
                                     ", locked = " + (bLocked ? "1" : "0") +
@@ -402,12 +437,12 @@ public class InstrumentSettingsFragment extends Fragment {
                                 ii.setConnection("TCPIP0::localhost::inst0::INSTR");
                                 ii.setConnected(true);
                                 instrumentInfoList.add(0, ii);
-                                mDBService.execSQL("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::INSTR', 0, 0, 1, 0 )");
+                                mDBService.execSQL("INSERT INTO iis_instr ( connection, timeout, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::INSTR', 5, 0, 0, 1, 0 )");
                                 ii = new InstrumentInfo();
                                 ii.setConnection("TCPIP0::localhost::INSTR");
                                 ii.setConnected(true);
                                 instrumentInfoList.add(0, ii);
-                                mDBService.execSQL("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::inst0::INSTR', 0, 0, 1, 0 )");
+                                mDBService.execSQL("INSERT INTO iis_instr ( connection, timeout, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::inst0::INSTR', 5, 0, 0, 1, 0 )");
 
                                 mInstrumentArrayList.clear();
                                 int instrumentInfoListSize = instrumentInfoList.size();

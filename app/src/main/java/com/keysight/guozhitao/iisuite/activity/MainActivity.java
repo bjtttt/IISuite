@@ -61,16 +61,18 @@ public class MainActivity
     public final String mInstrDBName = "iis_instr";
     public final String[] mInstrDBColNames = new String[] {
             "connection",
+            "timeout",
             "idn",
             "scpitree",
             "connected",
             "locked"
     };
     public final int DB_INSTR_COL_CONNECTION = 0;
-    public final int DB_INSTR_COL_IDN = 1;
-    public final int DB_INSTR_COL_SCPI_TREE = 2;
-    public final int DB_INSTR_COL_CONNECTED = 3;
-    public final int DB_INSTR_COL_LOCKED = 4;
+    public final int DB_INSTR_COL_TIMEOUT = 1;
+    public final int DB_INSTR_COL_IDN = 2;
+    public final int DB_INSTR_COL_SCPI_TREE = 3;
+    public final int DB_INSTR_COL_CONNECTED = 4;
+    public final int DB_INSTR_COL_LOCKED = 5;
 
     public final String mServerDBName = "iis_server";
     public final String[] mServerDBColNames = new String[] {
@@ -110,6 +112,7 @@ public class MainActivity
         while (c.isAfterLast() == false) {
             InstrumentInfo ii = new InstrumentInfo();
             ii.setConnection(c.getString(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_CONNECTION])));
+            ii.setTimeout(c.getInt(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_TIMEOUT])));
             ii.setIDN(c.getInt(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_IDN])) == 1);
             ii.setSCPI(c.getInt(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_SCPI_TREE])) == 1);
             ii.setConnected(c.getInt(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_CONNECTED])) == 1);
@@ -128,14 +131,14 @@ public class MainActivity
             ii.setConnection("TCPIP0::localhost::inst0::INSTR");
             ii.setConnected(true);
             mGlobalSettings.getInstrumentInfoList().add(0, ii);
-            mDBService.execSQL("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::inst0::INSTR', 0, 0, 1, 0 )");
+            mDBService.execSQL("INSERT INTO iis_instr ( connection, timeout, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::inst0::INSTR', 5, 0, 0, 1, 0 )");
         }
         if(bFindLocalShort == false) {
             InstrumentInfo ii = new InstrumentInfo();
             ii.setConnection("TCPIP0::localhost::INSTR");
             ii.setConnected(true);
             mGlobalSettings.getInstrumentInfoList().add(0, ii);
-            mDBService.execSQL("INSERT INTO iis_instr ( connection, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::INSTR', 0, 0, 1, 0 )");
+            mDBService.execSQL("INSERT INTO iis_instr ( connection, timeout, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::INSTR', 5, 0, 0, 1, 0 )");
         }
 
         c = mDBService.rawQuery("SELECT * FROM iis_server ORDER BY server", null);
