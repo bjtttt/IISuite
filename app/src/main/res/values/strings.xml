@@ -499,6 +499,7 @@
     <string name="connected">Connected</string>
     <string name="locked">Locked</string>
     <string name="connection">Connection</string>
+    <string name="timeout">Timeout (s)</string>
     <string name="server">Server</string>
     <string name="input_server">Input Server</string>
     <string name="modify_server">Modify Server</string>

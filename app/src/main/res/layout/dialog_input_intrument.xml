@@ -8,7 +8,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="40dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -17,25 +17,43 @@
             android:id="@+id/txtv_connection" />
 
         <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/edittxt_connection" />
 
-        <com.keysight.guozhitao.iisuite.helper.horizontalpicker.HorizontalPicker
-            android:id="@+id/picker"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:textColor="@color/text_color"
-            android:textSize="22sp"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp"
-            android:ellipsize="marquee"
-            android:marqueeRepeatLimit="2"
-            app:values="@array/values"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            app:dividerSize="10dp"
-            app:sideItems="@integer/numSideItems"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/timeout"
+            android:id="@+id/txtv_timeout" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/minus"
+            android:id="@+id/button_decrease_timeout" />
+
+        <EditText
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/etxt_timeout" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/plus"
+            android:id="@+id/button_increase_timeout" />
 
     </LinearLayout>
 
@@ -67,5 +85,6 @@
             android:layout_height="wrap_content"
             android:text="@string/locked"
             android:id="@+id/chkbox_locked" />
-        </LinearLayout>
+
+    </LinearLayout>
 </LinearLayout>
