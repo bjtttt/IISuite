@@ -131,31 +131,49 @@ public class InstrumentSettingsFragment extends Fragment {
         //    getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //    v = inflater.inflate(R.layout.fragment_instrument_settings_vertical, container, false);
         //}
-        Button btnIncrease = (Button) v.findViewById(R.id.button_increase_timeout);
+        Button btnIncrease = (Button) v.findViewById(R.id.button_increase_instrument_timeout);
+        final EditText etxtTimeout =  (EditText) v.findViewById(R.id.etxt_instrument_timeout);
         btnIncrease.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                int iTimeout = Integer.getInteger(etxtTimeout.getText().toString());
+                if(iTimeout <= GlobalSettings.MIN_TIMEOUT)
+                    return;
+                if(iTimeout >= GlobalSettings.MAX_TIMEOUT)
+                    return;
+                iTimeout = iTimeout + 1;
+                etxtTimeout.setText(Integer.toString(iTimeout));
             }
         });
+        /*
         btnIncrease.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 return true;
             }
         });
-        Button btnDecrease = (Button) v.findViewById(R.id.button_decrease_timeout);
+        */
+        Button btnDecrease = (Button) v.findViewById(R.id.button_decrease_instrument_timeout);
         btnDecrease.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                int iTimeout = Integer.getInteger(etxtTimeout.getText().toString());
+                if(iTimeout <= GlobalSettings.MIN_TIMEOUT)
+                    return;
+                if(iTimeout >= GlobalSettings.MAX_TIMEOUT)
+                    return;
+                iTimeout = iTimeout + 1;
+                etxtTimeout.setText(Integer.toString(iTimeout));
             }
         });
+        /*
         btnDecrease.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                return true;
             }
         });
+        */
 
         Button btnAdd = (Button) v.findViewById(R.id.btn_add_instrument);
         btnAdd.setOnClickListener(new View.OnClickListener() {
@@ -167,7 +185,7 @@ public class InstrumentSettingsFragment extends Fragment {
                 builder.setTitle(getString(R.string.input_instrument));
                 builder.setView(ll);
                 final EditText edittxtConnection = (EditText) ll.findViewById(R.id.edittxt_connection);
-                final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_timeout);
+                final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_instrument_timeout);
                 final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_instrument_connected);
                 final CheckBox chkboxLocked = (CheckBox) ll.findViewById(R.id.chkbox_locked);
                 final CheckBox chkboxIDN = (CheckBox) ll.findViewById(R.id.chkbox_idn);
@@ -220,7 +238,7 @@ public class InstrumentSettingsFragment extends Fragment {
                                 instrumentInfoList.add(instrumentInfoList.size(), ii);
                                 String sql = "INSERT INTO iis_instr ( connection, timeout, idn, scpitree, connected, locked ) VALUES ( '" +
                                         sInstrument +
-                                        "', " + iTimeout +
+                                        "', " + Integer.toString(iTimeout) +
                                         ", " + (bIDN ? "1" : "0") +
                                         ", " + (bSCPI ? "1" : "0") +
                                         ", " + (bConnected ? "1" : "0") +
@@ -314,7 +332,7 @@ public class InstrumentSettingsFragment extends Fragment {
                 builder.setTitle(getString(R.string.modify_instrument));
                 builder.setView(ll);
                 final EditText edittxtConnection = (EditText) ll.findViewById(R.id.edittxt_connection);
-                final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_timeout);
+                final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_instrument_timeout);
                 final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_instrument_connected);
                 final CheckBox chkboxLocked = (CheckBox) ll.findViewById(R.id.chkbox_locked);
                 final CheckBox chkboxIDN = (CheckBox) ll.findViewById(R.id.chkbox_idn);
@@ -342,7 +360,7 @@ public class InstrumentSettingsFragment extends Fragment {
                             ii.setSCPI(bSCPI);
 
                             String sql = "UPDATE iis_instr set " +
-                                    "timeout = " + iTimeout +
+                                    "timeout = " + Integer.toString(iTimeout) +
                                     ", idn = " + (bIDN ? "1" : "0") +
                                     ", scpitree = " + (bSCPI ? "1" : "0") +
                                     ", connected = " + (bConnected ? "1" : "0") +

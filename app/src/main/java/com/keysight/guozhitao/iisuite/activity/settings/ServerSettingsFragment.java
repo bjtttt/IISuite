@@ -112,6 +112,51 @@ public class ServerSettingsFragment extends Fragment {
         mViewGroup = container;
 
         View v = inflater.inflate(R.layout.fragment_server_settings, container, false);
+
+        Button btnIncrease = (Button) v.findViewById(R.id.button_increase_server_timeout);
+        final EditText etxtTimeout =  (EditText) v.findViewById(R.id.etxt_server_timeout);
+        btnIncrease.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int iTimeout = Integer.getInteger(etxtTimeout.getText().toString());
+                if(iTimeout <= GlobalSettings.MIN_TIMEOUT)
+                    return;
+                if(iTimeout >= GlobalSettings.MAX_TIMEOUT)
+                    return;
+                iTimeout = iTimeout + 1;
+                etxtTimeout.setText(Integer.toString(iTimeout));
+            }
+        });
+        /*
+        btnIncrease.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return true;
+            }
+        });
+        */
+        Button btnDecrease = (Button) v.findViewById(R.id.button_decrease_server_timeout);
+        btnDecrease.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int iTimeout = Integer.getInteger(etxtTimeout.getText().toString());
+                if(iTimeout <= GlobalSettings.MIN_TIMEOUT)
+                    return;
+                if(iTimeout >= GlobalSettings.MAX_TIMEOUT)
+                    return;
+                iTimeout = iTimeout + 1;
+                etxtTimeout.setText(Integer.toString(iTimeout));
+            }
+        });
+        /*
+        btnDecrease.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return true;
+            }
+        });
+        */
+
         Button btnAdd = (Button) v.findViewById(R.id.btn_add_server);
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,11 +167,13 @@ public class ServerSettingsFragment extends Fragment {
                 builder.setTitle(getString(R.string.input_server));
                 builder.setView(ll);
                 final EditText edittxtServer = (EditText) ll.findViewById(R.id.edittxt_server);
+                final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_server_timeout);
                 final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_server_connected);
                 builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final String sServer = edittxtServer.getText().toString().trim();
+                        final int iTimeout = Integer.getInteger(etxtTimeout.getText().toString());
                         final boolean bConnected = chkboxConncted.isChecked();
                         if(sServer.isEmpty()) {
                             AlertDialog.Builder builderEmpty = new AlertDialog.Builder(getActivity());
@@ -159,11 +206,13 @@ public class ServerSettingsFragment extends Fragment {
                             } else {
                                 ServerInfo si = new ServerInfo();
                                 si.setServer(sServer);
+                                si.setTimeout(iTimeout);
                                 si.setConnected(bConnected);
                                 serverInfoList.add(serverInfoList.size(), si);
-                                String sql = "INSERT INTO iis_server ( server, connected ) VALUES ( '" +
+                                String sql = "INSERT INTO iis_server ( server, timeout, connected ) VALUES ( '" +
                                         sServer +
-                                        "', " + (bConnected ? "1" : "0") +
+                                        "', " + Integer.toString(iTimeout) +
+                                        ", " + (bConnected ? "1" : "0") +
                                         " )";
                                 mDBService.execSQL(sql);
                                 HashMap<String, String> map = new HashMap<String, String>();
@@ -253,19 +302,23 @@ public class ServerSettingsFragment extends Fragment {
                 builder.setTitle(getString(R.string.modify_server));
                 builder.setView(ll);
                 final EditText edittxtServer = (EditText) ll.findViewById(R.id.edittxt_server);
+                final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_server_timeout);
                 final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_server_connected);
                 edittxtServer.setText(si.getServer());
+                etxtTimeout.setText(si.getTimeout());
                 edittxtServer.setEnabled(false);
                 chkboxConncted.setChecked(si.getConnected());
                 builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        final int iTimeout = Integer.getInteger(etxtTimeout.getText().toString());
                         final boolean bConnected = chkboxConncted.isChecked();
-                        if(bConnected != si.getConnected()) {
+                        if(iTimeout != si.getTimeout() || bConnected != si.getConnected()) {
                             si.setConnected(bConnected);
 
                             String sql = "UPDATE iis_server set " +
-                                    "connected = " + (bConnected ? "1" : "0") +
+                                    "timeout = " + Integer.toString(iTimeout) +
+                                    ", connected = " + (bConnected ? "1" : "0") +
                                     " WHERE server = '" + si.getServer() + "'";
                             mDBService.execSQL(sql);
 
@@ -355,7 +408,7 @@ public class ServerSettingsFragment extends Fragment {
                                 si.setServer("localhost");
                                 si.setConnected(true);
                                 serverInfoList.add(0, si);
-                                mDBService.execSQL("INSERT INTO iis_server ( server, connected ) VALUES ( 'localhost', 1 )");
+                                mDBService.execSQL("INSERT INTO iis_server ( server, timeout, connected ) VALUES ( 'localhost', 5, 1 )");
 
                                 mServerArrayList.clear();
                                 int serverInfoListSize = serverInfoList.size();

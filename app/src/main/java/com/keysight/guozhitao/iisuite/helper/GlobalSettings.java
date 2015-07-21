@@ -8,6 +8,9 @@ import java.util.ArrayList;
  */
 public class GlobalSettings implements Serializable {
 
+    public final static int MIN_TIMEOUT = 5;
+    public final static int MAX_TIMEOUT = 3600 * 24;
+
     private InstrumentInfo mCurrentInstrumentInfo = null;
 
     public InstrumentInfo getCurrentInstrumentInfo() {

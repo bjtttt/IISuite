@@ -7,10 +7,10 @@ import java.io.Serializable;
  */
 public class InstrumentInfo implements Serializable {
     private String mConnection = "";
-    private int mTimeout = 5;
+    private int mTimeout = GlobalSettings.MIN_TIMEOUT;
     private boolean mIDN = false;
     private boolean mSCPI = false;
-    private boolean mConnected = false;
+    private boolean mConnected = true;
     private boolean mLocked = false;
 
     public InstrumentInfo() {
@@ -25,7 +25,9 @@ public class InstrumentInfo implements Serializable {
     }
 
     public void setTimeout(int i) {
-        if(i < 5)
+        if(i < GlobalSettings.MIN_TIMEOUT)
+            throw new IllegalArgumentException(String.format("InstrumentInfo:setTimeout(%d)", i));
+        if(i > GlobalSettings.MAX_TIMEOUT)
             throw new IllegalArgumentException(String.format("InstrumentInfo:setTimeout(%d)", i));
         mTimeout = i;
     }

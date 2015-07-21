@@ -77,10 +77,12 @@ public class MainActivity
     public final String mServerDBName = "iis_server";
     public final String[] mServerDBColNames = new String[] {
             "server",
+            "timeout",
             "connected"
     };
     public final int DB_SERVER_COL_SERVER = 0;
-    public final int DB_SERVER_COL_CONNECTED = 1;
+    public final int DB_SERVER_COL_TIMEOUT = 1;
+    public final int DB_SERVER_COL_CONNECTED = 2;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -147,6 +149,7 @@ public class MainActivity
         while (c.isAfterLast() == false) {
             ServerInfo si = new ServerInfo();
             si.setServer(c.getString(c.getColumnIndex(mServerDBColNames[DB_SERVER_COL_SERVER])));
+            si.setTimeout(c.getInt(c.getColumnIndex(mServerDBColNames[DB_SERVER_COL_TIMEOUT])));
             si.setConnected(c.getInt(c.getColumnIndex(mServerDBColNames[DB_SERVER_COL_CONNECTED])) == 1);
             mGlobalSettings.getServerInfoList().add(si);
 
@@ -160,7 +163,7 @@ public class MainActivity
             si.setServer("localhost");
             si.setConnected(true);
             mGlobalSettings.getServerInfoList().add(0, si);
-            mDBService.execSQL("INSERT INTO iis_server ( server, connected ) VALUES ( 'localhost', 1 )");
+            mDBService.execSQL("INSERT INTO iis_server ( server, timeout , connected ) VALUES ( 'localhost', 5, 1 )");
         }
 
         setContentView(R.layout.activity_main);

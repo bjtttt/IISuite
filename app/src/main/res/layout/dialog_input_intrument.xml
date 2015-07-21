@@ -32,28 +32,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/timeout"
-            android:id="@+id/txtv_timeout" />
+            android:id="@+id/txtv_instrument_timeout" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:background="@drawable/minus"
-            android:id="@+id/button_decrease_timeout" />
+            android:id="@+id/button_decrease_instrument_timeout" />
 
         <EditText
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:inputType="number"
             android:ems="10"
-            android:id="@+id/etxt_timeout" />
+            android:id="@+id/etxt_instrument_timeout" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:background="@drawable/plus"
-            android:id="@+id/button_increase_timeout" />
+            android:id="@+id/button_increase_instrument_timeout" />
 
     </LinearLayout>
 

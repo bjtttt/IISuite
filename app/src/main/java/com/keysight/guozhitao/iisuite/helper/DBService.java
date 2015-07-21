@@ -27,6 +27,7 @@ public class DBService extends SQLiteOpenHelper implements Serializable {
 
         sql = "CREATE TABLE iis_server ( " +
                 "server VARCHAR(100) PRIMARY KEY, " +
+                "timeout INTEGER NOT NULL DEFAULT 5, " +
                 "connected BOOLEAN NOT NULL DEFAULT FALSE )";
         db.execSQL(sql);
     }
