@@ -7,7 +7,7 @@
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
         android:id="@+id/instrument_connection_string"
-        android:textSize="20dp">
+        android:textSize="15dp">
     </TextView>
     <TextView
         android:layout_height="wrap_content"

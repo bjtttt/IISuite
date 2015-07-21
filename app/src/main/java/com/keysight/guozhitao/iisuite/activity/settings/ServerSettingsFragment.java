@@ -113,50 +113,6 @@ public class ServerSettingsFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_server_settings, container, false);
 
-        Button btnIncrease = (Button) v.findViewById(R.id.button_increase_server_timeout);
-        final EditText etxtTimeout =  (EditText) v.findViewById(R.id.etxt_server_timeout);
-        btnIncrease.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int iTimeout = Integer.getInteger(etxtTimeout.getText().toString());
-                if(iTimeout <= GlobalSettings.MIN_TIMEOUT)
-                    return;
-                if(iTimeout >= GlobalSettings.MAX_TIMEOUT)
-                    return;
-                iTimeout = iTimeout + 1;
-                etxtTimeout.setText(Integer.toString(iTimeout));
-            }
-        });
-        /*
-        btnIncrease.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                return true;
-            }
-        });
-        */
-        Button btnDecrease = (Button) v.findViewById(R.id.button_decrease_server_timeout);
-        btnDecrease.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int iTimeout = Integer.getInteger(etxtTimeout.getText().toString());
-                if(iTimeout <= GlobalSettings.MIN_TIMEOUT)
-                    return;
-                if(iTimeout >= GlobalSettings.MAX_TIMEOUT)
-                    return;
-                iTimeout = iTimeout + 1;
-                etxtTimeout.setText(Integer.toString(iTimeout));
-            }
-        });
-        /*
-        btnDecrease.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                return true;
-            }
-        });
-        */
-
         Button btnAdd = (Button) v.findViewById(R.id.btn_add_server);
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -168,12 +124,39 @@ public class ServerSettingsFragment extends Fragment {
                 builder.setView(ll);
                 final EditText edittxtServer = (EditText) ll.findViewById(R.id.edittxt_server);
                 final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_server_timeout);
+                etxtTimeout.setText(Integer.toString(GlobalSettings.MIN_TIMEOUT));
                 final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_server_connected);
+                Button btnIncrease = (Button) ll.findViewById(R.id.button_increase_server_timeout);
+                btnIncrease.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
+                        iTimeout = iTimeout + 1;
+                        if(iTimeout < GlobalSettings.MIN_TIMEOUT)
+                            iTimeout = GlobalSettings.MIN_TIMEOUT;
+                        if(iTimeout > GlobalSettings.MAX_TIMEOUT)
+                            iTimeout = GlobalSettings.MAX_TIMEOUT;
+                        etxtTimeout.setText(Integer.toString(iTimeout));
+                    }
+                });
+                Button btnDecrease = (Button) ll.findViewById(R.id.button_decrease_server_timeout);
+                btnDecrease.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
+                        iTimeout = iTimeout - 1;
+                        if(iTimeout < GlobalSettings.MIN_TIMEOUT)
+                            iTimeout = GlobalSettings.MIN_TIMEOUT;
+                        if(iTimeout > GlobalSettings.MAX_TIMEOUT)
+                            iTimeout = GlobalSettings.MAX_TIMEOUT;
+                        etxtTimeout.setText(Integer.toString(iTimeout));
+                    }
+                });
                 builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final String sServer = edittxtServer.getText().toString().trim();
-                        final int iTimeout = Integer.getInteger(etxtTimeout.getText().toString());
+                        final int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
                         final boolean bConnected = chkboxConncted.isChecked();
                         if(sServer.isEmpty()) {
                             AlertDialog.Builder builderEmpty = new AlertDialog.Builder(getActivity());
@@ -305,15 +288,42 @@ public class ServerSettingsFragment extends Fragment {
                 final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_server_timeout);
                 final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_server_connected);
                 edittxtServer.setText(si.getServer());
-                etxtTimeout.setText(si.getTimeout());
+                etxtTimeout.setText(Integer.toString(si.getTimeout()));
                 edittxtServer.setEnabled(false);
                 chkboxConncted.setChecked(si.getConnected());
+                Button btnIncrease = (Button) ll.findViewById(R.id.button_increase_server_timeout);
+                btnIncrease.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
+                        iTimeout = iTimeout + 1;
+                        if (iTimeout < GlobalSettings.MIN_TIMEOUT)
+                            iTimeout = GlobalSettings.MIN_TIMEOUT;
+                        if (iTimeout > GlobalSettings.MAX_TIMEOUT)
+                            iTimeout = GlobalSettings.MAX_TIMEOUT;
+                        etxtTimeout.setText(Integer.toString(iTimeout));
+                    }
+                });
+                Button btnDecrease = (Button) ll.findViewById(R.id.button_decrease_server_timeout);
+                btnDecrease.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
+                        iTimeout = iTimeout - 1;
+                        if (iTimeout < GlobalSettings.MIN_TIMEOUT)
+                            iTimeout = GlobalSettings.MIN_TIMEOUT;
+                        if (iTimeout > GlobalSettings.MAX_TIMEOUT)
+                            iTimeout = GlobalSettings.MAX_TIMEOUT;
+                        etxtTimeout.setText(Integer.toString(iTimeout));
+                    }
+                });
                 builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        final int iTimeout = Integer.getInteger(etxtTimeout.getText().toString());
+                        final int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
                         final boolean bConnected = chkboxConncted.isChecked();
                         if(iTimeout != si.getTimeout() || bConnected != si.getConnected()) {
+                            si.setTimeout(iTimeout);
                             si.setConnected(bConnected);
 
                             String sql = "UPDATE iis_server set " +

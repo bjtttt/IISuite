@@ -7,12 +7,13 @@
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
         android:id="@+id/server_connection_string"
-        android:textSize="25dip">
+        android:textSize="15dp">
     </TextView>
     <TextView
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
-        android:id="@+id/server_connection_configuration">
+        android:id="@+id/server_connection_configuration"
+        android:textSize="10dp">
     </TextView>
 
 </LinearLayout>

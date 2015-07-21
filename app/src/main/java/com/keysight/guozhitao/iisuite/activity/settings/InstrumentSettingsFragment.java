@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -131,49 +132,6 @@ public class InstrumentSettingsFragment extends Fragment {
         //    getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //    v = inflater.inflate(R.layout.fragment_instrument_settings_vertical, container, false);
         //}
-        Button btnIncrease = (Button) v.findViewById(R.id.button_increase_instrument_timeout);
-        final EditText etxtTimeout =  (EditText) v.findViewById(R.id.etxt_instrument_timeout);
-        btnIncrease.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int iTimeout = Integer.getInteger(etxtTimeout.getText().toString());
-                if(iTimeout <= GlobalSettings.MIN_TIMEOUT)
-                    return;
-                if(iTimeout >= GlobalSettings.MAX_TIMEOUT)
-                    return;
-                iTimeout = iTimeout + 1;
-                etxtTimeout.setText(Integer.toString(iTimeout));
-            }
-        });
-        /*
-        btnIncrease.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                return true;
-            }
-        });
-        */
-        Button btnDecrease = (Button) v.findViewById(R.id.button_decrease_instrument_timeout);
-        btnDecrease.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int iTimeout = Integer.getInteger(etxtTimeout.getText().toString());
-                if(iTimeout <= GlobalSettings.MIN_TIMEOUT)
-                    return;
-                if(iTimeout >= GlobalSettings.MAX_TIMEOUT)
-                    return;
-                iTimeout = iTimeout + 1;
-                etxtTimeout.setText(Integer.toString(iTimeout));
-            }
-        });
-        /*
-        btnDecrease.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                return true;
-            }
-        });
-        */
 
         Button btnAdd = (Button) v.findViewById(R.id.btn_add_instrument);
         btnAdd.setOnClickListener(new View.OnClickListener() {
@@ -186,15 +144,42 @@ public class InstrumentSettingsFragment extends Fragment {
                 builder.setView(ll);
                 final EditText edittxtConnection = (EditText) ll.findViewById(R.id.edittxt_connection);
                 final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_instrument_timeout);
+                etxtTimeout.setText(Integer.toString(GlobalSettings.MIN_TIMEOUT));
                 final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_instrument_connected);
                 final CheckBox chkboxLocked = (CheckBox) ll.findViewById(R.id.chkbox_locked);
                 final CheckBox chkboxIDN = (CheckBox) ll.findViewById(R.id.chkbox_idn);
                 final CheckBox chkboxSCPI = (CheckBox) ll.findViewById(R.id.chkbox_scpi);
+                Button btnIncrease = (Button) ll.findViewById(R.id.button_increase_instrument_timeout);
+                btnIncrease.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
+                        iTimeout = iTimeout + 1;
+                        if(iTimeout < GlobalSettings.MIN_TIMEOUT)
+                            iTimeout = GlobalSettings.MIN_TIMEOUT;
+                        if(iTimeout > GlobalSettings.MAX_TIMEOUT)
+                            iTimeout = GlobalSettings.MAX_TIMEOUT;
+                        etxtTimeout.setText(Integer.toString(iTimeout));
+                    }
+                });
+                Button btnDecrease = (Button) ll.findViewById(R.id.button_decrease_instrument_timeout);
+                btnDecrease.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
+                        iTimeout = iTimeout - 1;
+                        if(iTimeout < GlobalSettings.MIN_TIMEOUT)
+                            iTimeout = GlobalSettings.MIN_TIMEOUT;
+                        if(iTimeout > GlobalSettings.MAX_TIMEOUT)
+                            iTimeout = GlobalSettings.MAX_TIMEOUT;
+                        etxtTimeout.setText(Integer.toString(iTimeout));
+                    }
+                });
                 builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final String sInstrument = edittxtConnection.getText().toString().trim();
-                        final int iTimeout = Integer.getInteger(etxtTimeout.getText().toString());
+                        final int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
                         final boolean bConnected = chkboxConncted.isChecked();
                         final boolean bLocked = chkboxLocked.isChecked();
                         final boolean bIDN = chkboxIDN.isChecked();
@@ -339,15 +324,41 @@ public class InstrumentSettingsFragment extends Fragment {
                 final CheckBox chkboxSCPI = (CheckBox) ll.findViewById(R.id.chkbox_scpi);
                 edittxtConnection.setText(ii.getConnection());
                 edittxtConnection.setEnabled(false);
-                etxtTimeout.setText(ii.getTimeout());
+                etxtTimeout.setText(Integer.toString(ii.getTimeout()));
                 chkboxConncted.setChecked(ii.getConnected());
                 chkboxLocked.setChecked(ii.getLocked());
                 chkboxIDN.setChecked(ii.getIDN());
                 chkboxSCPI.setChecked(ii.getSCPI());
+                Button btnIncrease = (Button) ll.findViewById(R.id.button_increase_instrument_timeout);
+                btnIncrease.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
+                        iTimeout = iTimeout + 1;
+                        if (iTimeout < GlobalSettings.MIN_TIMEOUT)
+                            iTimeout = GlobalSettings.MIN_TIMEOUT;
+                        if (iTimeout > GlobalSettings.MAX_TIMEOUT)
+                            iTimeout = GlobalSettings.MAX_TIMEOUT;
+                        etxtTimeout.setText(Integer.toString(iTimeout));
+                    }
+                });
+                Button btnDecrease = (Button) ll.findViewById(R.id.button_decrease_instrument_timeout);
+                btnDecrease.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
+                        iTimeout = iTimeout - 1;
+                        if (iTimeout < GlobalSettings.MIN_TIMEOUT)
+                            iTimeout = GlobalSettings.MIN_TIMEOUT;
+                        if (iTimeout > GlobalSettings.MAX_TIMEOUT)
+                            iTimeout = GlobalSettings.MAX_TIMEOUT;
+                        etxtTimeout.setText(Integer.toString(iTimeout));
+                    }
+                });
                 builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        final int iTimeout = Integer.getInteger(etxtTimeout.getText().toString());
+                        final int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
                         final boolean bConnected = chkboxConncted.isChecked();
                         final boolean bLocked = chkboxLocked.isChecked();
                         final boolean bIDN = chkboxIDN.isChecked();

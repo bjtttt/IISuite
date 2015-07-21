@@ -34,24 +34,27 @@
 
         <Button
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:background="@drawable/minus"
-            android:id="@+id/button_decrease_server_timeout" />
+            android:id="@+id/button_decrease_server_timeout"
+            android:layout_gravity="center" />
 
         <EditText
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:inputType="number"
             android:ems="10"
-            android:id="@+id/etxt_server_timeout" />
+            android:id="@+id/etxt_server_timeout"
+            android:gravity="center_vertical|center_horizontal" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:background="@drawable/plus"
-            android:id="@+id/button_increase_server_timeout" />
+            android:id="@+id/button_increase_server_timeout"
+            android:layout_gravity="center" />
 
     </LinearLayout>
 
