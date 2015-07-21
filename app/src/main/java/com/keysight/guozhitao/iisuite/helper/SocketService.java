@@ -18,9 +18,23 @@ public class SocketService implements Serializable {
     }
 
     public void OpenSocket() throws IOException {
-        if(!mSocket.isClosed())
-            mSocket.close();
+        CloseSocket();
 
-        mSocket = new Socket(mGlobalSettings.getCurrentServerInfo().getServer(), 6910);
+        mSocket = new Socket(mGlobalSettings.getCurrentServerInfo().getServer(), GlobalSettings.SOCKET_PORT);
+    }
+
+    public void CloseSocket() throws IOException {
+        if(!mSocket.isClosed()) {
+            mSocket.close();
+            mSocket = null;
+        }
+    }
+
+    public void SendData(byte[] ba) throws IOException {
+        if(mSocket == null)
+            OpenSocket();
+        
+        if(!mGlobalSettings.getCurrentInstrumentInfo().getConnected())
+            CloseSocket();
     }
 }
