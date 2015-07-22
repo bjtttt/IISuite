@@ -11,7 +11,8 @@ public class GlobalSettings implements Serializable {
     public final static int MIN_TIMEOUT = 5;
     public final static int MAX_TIMEOUT = 3600 * 24;
 
-    public final static int SOCKET_PORT = 6910;
+    public final static int INSTRUMENT_SOCKET_PORT = 5923;
+    public final static int SERVER_SOCKET_PORT = 6910;
 
     private InstrumentInfo mCurrentInstrumentInfo = null;
 

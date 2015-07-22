@@ -34,8 +34,8 @@
 
         <Button
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:background="@drawable/minus"
             android:id="@+id/button_decrease_server_timeout"
             android:layout_gravity="center" />
@@ -50,8 +50,8 @@
 
         <Button
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:background="@drawable/plus"
             android:id="@+id/button_increase_server_timeout"
             android:layout_gravity="center" />
