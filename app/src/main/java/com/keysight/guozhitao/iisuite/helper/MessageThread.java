@@ -13,12 +13,8 @@ import java.io.UnsupportedEncodingException;
  */
 public class MessageThread extends Thread implements Serializable {
 
-    public final static int OPEN_INSTRUMENT = 0x00;
-    public final static int CLOSE_INSTRUMENT = 0x01;
-    public final static int SEND_DATA_TO_INSTRUMENT = 0x02;
-    public final static int OPEN_SERVER = 0x03;
-    public final static int CLOSE_SERVER = 0x04;
-    public final static int SEND_DATA_TO_SERVER = 0x05;
+    public final static int INSTRUMENT_MESSAGE = 0x00;
+    public final static int SERVER_MESSAGE = 0x01;
 
     private Handler mHandler = null;
     private GlobalSettings mGlobalSettings = null;
@@ -42,23 +38,9 @@ public class MessageThread extends Thread implements Serializable {
                 switch(msg.what) {
                     default:
                         break;
-                    case OPEN_INSTRUMENT:
-                        //sendOpenInstrumentMessage();
+                    case INSTRUMENT_MESSAGE:
                         break;
-                    case CLOSE_INSTRUMENT:
-                        //sendCloseInstrumentMessage();
-                        break;
-                    case SEND_DATA_TO_INSTRUMENT:
-                        //sendDataToInstrumentMessage(msg.getData().getString("scpi"));
-                        break;
-                    case OPEN_SERVER:
-                        //sendOpenServerMessage();
-                        break;
-                    case CLOSE_SERVER:
-                        //sendCloseServerMessage();
-                        break;
-                    case SEND_DATA_TO_SERVER:
-                        //sendDataToServerMessage(msg.getData().getByteArray("log"));
+                    case SERVER_MESSAGE:
                         break;
                 }
             }

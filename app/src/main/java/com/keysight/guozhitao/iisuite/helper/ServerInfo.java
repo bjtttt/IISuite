@@ -45,6 +45,7 @@ public class ServerInfo implements Serializable {
 
     public String getServerConfiguration() {
         StringBuilder sb = new StringBuilder();
+        sb.append("Timeout ");
         sb.append(getTimeout() + "s, ");
         sb.append(getConnected()? "Connected" : "Unconnected");
 

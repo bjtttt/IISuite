@@ -1,5 +1,10 @@
 package com.keysight.guozhitao.iisuite.helper;
 
+import com.keysight.guozhitao.iisuite.helper.SocketThread.InstrumentReadThread;
+import com.keysight.guozhitao.iisuite.helper.SocketThread.InstrumentSendThread;
+import com.keysight.guozhitao.iisuite.helper.SocketThread.ServerReadThread;
+import com.keysight.guozhitao.iisuite.helper.SocketThread.ServerSendThread;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -44,7 +49,24 @@ public class SocketService implements Serializable {
     private InputStream mServerInputStream;
     private OutputStream mServerOutputStream;
 
-    public SocketService(GlobalSettings globalSettings) { mGlobalSettings = globalSettings; }
+    private InstrumentSendThread mInstrumentSendThread;
+    private InstrumentReadThread mInstrumentReadThread;
+    private ServerSendThread mServerSendThread;
+    private ServerReadThread mServerReadThread;
+
+    public SocketService(GlobalSettings globalSettings) {
+        mGlobalSettings = globalSettings;
+
+        mInstrumentSendThread = new InstrumentSendThread(globalSettings);
+        mInstrumentReadThread = new InstrumentReadThread(globalSettings);
+        mServerSendThread = new ServerSendThread(globalSettings);
+        mServerReadThread = new ServerReadThread(globalSettings);
+
+        mInstrumentSendThread.start();
+        mInstrumentReadThread.start();
+        mServerSendThread.start();
+        mServerReadThread.start();
+    }
 
     public Socket getInstrumentSocket() { return mInstrumentSocket; }
 

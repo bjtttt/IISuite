@@ -70,6 +70,7 @@ public class InstrumentInfo implements Serializable {
 
     public String getInstrumentConfiguration() {
         StringBuilder sb = new StringBuilder();
+        sb.append("Timeout ");
         sb.append(getTimeout() + "s, ");
         sb.append(getConnected()? "Connected, " : "Unconnected, ");
         sb.append(getLocked()? "Locked, " : "Unlocked, ");
