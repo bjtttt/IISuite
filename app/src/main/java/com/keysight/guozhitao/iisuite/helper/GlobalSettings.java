@@ -146,7 +146,7 @@ public class GlobalSettings implements Serializable {
         mDBService = dbs;
     }
 
-    public DBService getmDBService() {
+    public DBService getDBService() {
         return mDBService;
     }
 }
