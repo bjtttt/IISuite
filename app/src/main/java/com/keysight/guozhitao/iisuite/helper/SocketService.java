@@ -152,4 +152,12 @@ public class SocketService implements Serializable {
             mServerSocket = null;
         }
     }
+
+    public InstrumentSendThread getInstrumentSendThread() { return mInstrumentSendThread; }
+
+    public InstrumentReadThread getInstrumentReaddThread() { return mInstrumentReadThread; }
+
+    public ServerSendThread getServerSendThread() { return mServerSendThread; }
+
+    public ServerReadThread getServerReadThread() { return mServerReadThread; }
 }
