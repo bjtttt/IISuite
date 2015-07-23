@@ -14,6 +14,8 @@ public class GlobalSettings implements Serializable {
     public final static int INSTRUMENT_SOCKET_PORT = 5923;
     public final static int SERVER_SOCKET_PORT = 6910;
 
+    public final static int SERVER_PULSE_INTERVAL = 5000;
+
     private InstrumentInfo mCurrentInstrumentInfo = null;
 
     public InstrumentInfo getCurrentInstrumentInfo() {
@@ -148,5 +150,11 @@ public class GlobalSettings implements Serializable {
 
     public DBService getDBService() {
         return mDBService;
+    }
+
+    private MessageThread mMessageThread = new MessageThread(this);
+
+    public MessageThread getMessageThread() {
+        return mMessageThread;
     }
 }

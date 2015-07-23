@@ -112,7 +112,7 @@ public class InstrumentSettingsFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        mDBService = mGlobalSettings.getmDBService();
+        mDBService = mGlobalSettings.getDBService();
     }
 
     @Override

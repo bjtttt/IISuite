@@ -1,7 +1,10 @@
 package com.keysight.guozhitao.iisuite.helper;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 
 /*
@@ -34,22 +37,24 @@ CRC         : 1 byte
 public class SocketService implements Serializable {
 
     private GlobalSettings mGlobalSettings;
-
     private Socket mInstrumentSocket = null;
-
-    public Socket getInstrumentSocket() {
-        return mInstrumentSocket;
-    }
-
     private Socket mServerSocket = null;
+    private InputStream mInstrumentInputStream;
+    private OutputStream mInstrumentOutputStream;
+    private InputStream mServerInputStream;
+    private OutputStream mServerOutputStream;
 
-    public Socket getServerSocket() {
-        return mServerSocket;
+    public SocketService(GlobalSettings globalSettings) { mGlobalSettings = globalSettings; }
+
+    public Socket getInstrumentSocket() { return mInstrumentSocket; }
+
+    public boolean IsInstrumentSocketAvailable() {
+        return mInstrumentSocket != null;
     }
 
-    public SocketService(GlobalSettings globalSettings) {
-        mGlobalSettings = globalSettings;
-    }
+    public Socket getServerSocket() { return mServerSocket; }
+
+    public boolean IsServerSocketAvailable() { return mServerSocket != null; }
 
     private void OpenServerSocket() throws IOException {
         CloseServerSocket();
@@ -73,17 +78,41 @@ public class SocketService implements Serializable {
         }
     }
 
-    private void SendServerData(String s) throws IOException {
+    public void SafeCloseServerSocket() {
+        try {
+            CloseServerSocket();
+        }
+        catch(Exception e) {
+            mServerSocket = null;
+        }
+    }
+
+    protected void SendServerData(String s) throws IOException {
         if(s == null)
             throw new IllegalArgumentException("SocketService::SendData(null)");
         if(s.isEmpty())
             throw new IllegalArgumentException("SocketService::SendData(\"\")");
 
-        byte[] ba = s.getBytes();
+        byte[] ba = null;
+        try {
+            ba = s.getBytes("UTF-8");
+        }
+        catch (UnsupportedEncodingException e) {
+            ba = s.getBytes();
+        }
         SendServerData(ba);
     }
 
-    private void SendServerData(byte[] ba) throws IOException {
+    public void SafeSendServerData(String sMessage){
+        try {
+            SendServerData(sMessage);
+        }
+        catch(Exception e) {
+            mServerSocket = null;
+        }
+    }
+
+    private void SendServerData(byte[] baMessage) throws IOException {
         if(mServerSocket == null)
             OpenServerSocket();
 
@@ -91,5 +120,14 @@ public class SocketService implements Serializable {
 
         if(!mGlobalSettings.getCurrentInstrumentInfo().getConnected())
             CloseServerSocket();
+    }
+
+    public void SafeSendServerData(byte[] baMessage){
+        try {
+            SendServerData(baMessage);
+        }
+        catch(Exception e) {
+            mServerSocket = null;
+        }
     }
 }
