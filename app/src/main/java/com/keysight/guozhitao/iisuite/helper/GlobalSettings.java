@@ -17,6 +17,17 @@ public class GlobalSettings implements Serializable {
     public final static int SERVER_PULSE_INTERVAL = 5000;
 
     private InstrumentInfo mCurrentInstrumentInfo = null;
+    private ArrayList<InstrumentInfo> mInstrInfoList = new ArrayList<InstrumentInfo>();
+    private ServerInfo mCurrentServerInfo = null;
+    private ArrayList<ServerInfo> mServerInfoList = new ArrayList<ServerInfo>();
+
+    private DBService mDBService;
+    private SocketService mSocketService;
+    private MessageThread mMessageThread = new MessageThread(this);
+
+    public GlobalSettings() {
+        mSocketService = new SocketService(this);
+    }
 
     public InstrumentInfo getCurrentInstrumentInfo() {
         return mCurrentInstrumentInfo;
@@ -73,17 +84,9 @@ public class GlobalSettings implements Serializable {
         mCurrentInstrumentInfo = ii;
     }
 
-    private ArrayList<InstrumentInfo> mInstrInfoList = new ArrayList<InstrumentInfo>();
+    public ArrayList<InstrumentInfo> getInstrumentInfoList() { return mInstrInfoList; }
 
-    public ArrayList<InstrumentInfo> getInstrumentInfoList() {
-        return mInstrInfoList;
-    }
-
-    private ServerInfo mCurrentServerInfo = null;
-
-    public ServerInfo getCurrentServerInfo() {
-        return mCurrentServerInfo;
-    }
+    public ServerInfo getCurrentServerInfo() { return mCurrentServerInfo; }
 
     public void setCurrentServerInfo(int i) {
         if(i < -1 || i >= mServerInfoList.size())
@@ -119,7 +122,6 @@ public class GlobalSettings implements Serializable {
         if(server.length() < 1)
             throw new NullPointerException("GlobalSettings::setCurrentServerInfo(empty)");
 
-
         boolean bFind = false;
         ServerInfo si = null;
         for(ServerInfo info : mServerInfoList) {
@@ -136,25 +138,17 @@ public class GlobalSettings implements Serializable {
         mCurrentServerInfo = si;
     }
 
-    private ArrayList<ServerInfo> mServerInfoList = new ArrayList<ServerInfo>();
-
     public ArrayList<ServerInfo> getServerInfoList() {
         return mServerInfoList;
     }
 
-    private DBService mDBService;
+    public void setDBService(DBService dbs) { mDBService = dbs; }
 
-    public void setDBService(DBService dbs) {
-        mDBService = dbs;
-    }
+    public DBService getDBService() { return mDBService; }
 
-    public DBService getDBService() {
-        return mDBService;
-    }
+    public MessageThread getMessageThread() { return mMessageThread; }
 
-    private MessageThread mMessageThread = new MessageThread(this);
+    //public void setSocketService(SocketService socketService) { mSocketService = socketService; }
 
-    public MessageThread getMessageThread() {
-        return mMessageThread;
-    }
+    public SocketService getSocketService() { return mSocketService; }
 }

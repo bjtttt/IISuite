@@ -1,9 +1,7 @@
 package com.keysight.guozhitao.iisuite.helper;
 
-import com.keysight.guozhitao.iisuite.helper.SocketThread.InstrumentReadThread;
-import com.keysight.guozhitao.iisuite.helper.SocketThread.InstrumentSendThread;
-import com.keysight.guozhitao.iisuite.helper.SocketThread.ServerReadThread;
-import com.keysight.guozhitao.iisuite.helper.SocketThread.ServerSendThread;
+import com.keysight.guozhitao.iisuite.helper.SocketThread.InstrumentSocketThread;
+import com.keysight.guozhitao.iisuite.helper.SocketThread.ServerSocketThread;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,67 +47,61 @@ public class SocketService implements Serializable {
     private InputStream mServerInputStream;
     private OutputStream mServerOutputStream;
 
-    private InstrumentSendThread mInstrumentSendThread;
-    private InstrumentReadThread mInstrumentReadThread;
-    private ServerSendThread mServerSendThread;
-    private ServerReadThread mServerReadThread;
+    private InstrumentSocketThread mInstrumentSendThread;
+    private ServerSocketThread mServerSendThread;
 
     public SocketService(GlobalSettings globalSettings) {
         mGlobalSettings = globalSettings;
 
-        mInstrumentSendThread = new InstrumentSendThread(globalSettings);
-        mInstrumentReadThread = new InstrumentReadThread(globalSettings);
-        mServerSendThread = new ServerSendThread(globalSettings);
-        mServerReadThread = new ServerReadThread(globalSettings);
+        mInstrumentSendThread = new InstrumentSocketThread(globalSettings);
+        mServerSendThread = new ServerSocketThread(globalSettings);
 
         mInstrumentSendThread.start();
-        mInstrumentReadThread.start();
         mServerSendThread.start();
-        mServerReadThread.start();
     }
 
     public Socket getInstrumentSocket() { return mInstrumentSocket; }
 
-    public boolean IsInstrumentSocketAvailable() {
+    public boolean isInstrumentSocketAvailable() {
         return mInstrumentSocket != null;
     }
 
     public Socket getServerSocket() { return mServerSocket; }
 
-    public boolean IsServerSocketAvailable() { return mServerSocket != null; }
+    public boolean isServerSocketAvailable() { return mServerSocket != null; }
 
-    private void OpenServerSocket() throws IOException {
-        CloseServerSocket();
+    private void openServerSocket() throws IOException {
+        closeServerSocket();
 
         mServerSocket = new Socket(mGlobalSettings.getCurrentServerInfo().getServer(), GlobalSettings.SERVER_SOCKET_PORT);
     }
 
-    public void SafeOpenServerSocket() {
+    public void safeOpenServerSocket() {
         try {
-            OpenServerSocket();
+            openServerSocket();
         }
         catch(Exception e) {
             mServerSocket = null;
         }
     }
 
-    private void CloseServerSocket() throws IOException {
+    private void closeServerSocket() throws IOException {
         if(!mServerSocket.isClosed()) {
             mServerSocket.close();
             mServerSocket = null;
         }
     }
 
-    public void SafeCloseServerSocket() {
+    public void safeCloseServerSocket() {
         try {
-            CloseServerSocket();
+            closeServerSocket();
         }
         catch(Exception e) {
             mServerSocket = null;
         }
     }
 
-    protected void SendServerData(String s) throws IOException {
+    protected void sendServerData(String s) throws IOException {
         if(s == null)
             throw new IllegalArgumentException("SocketService::SendData(null)");
         if(s.isEmpty())
@@ -122,42 +114,38 @@ public class SocketService implements Serializable {
         catch (UnsupportedEncodingException e) {
             ba = s.getBytes();
         }
-        SendServerData(ba);
+        sendServerData(ba);
     }
 
-    public void SafeSendServerData(String sMessage){
+    public void safeSendServerData(String sMessage){
         try {
-            SendServerData(sMessage);
+            sendServerData(sMessage);
         }
         catch(Exception e) {
             mServerSocket = null;
         }
     }
 
-    private void SendServerData(byte[] baMessage) throws IOException {
+    private void sendServerData(byte[] baMessage) throws IOException {
         if(mServerSocket == null)
-            OpenServerSocket();
+            openServerSocket();
 
 
 
         if(!mGlobalSettings.getCurrentInstrumentInfo().getConnected())
-            CloseServerSocket();
+            closeServerSocket();
     }
 
-    public void SafeSendServerData(byte[] baMessage){
+    public void safeSendServerData(byte[] baMessage){
         try {
-            SendServerData(baMessage);
+            sendServerData(baMessage);
         }
         catch(Exception e) {
             mServerSocket = null;
         }
     }
 
-    public InstrumentSendThread getInstrumentSendThread() { return mInstrumentSendThread; }
+    public InstrumentSocketThread getInstrumentSendThread() { return mInstrumentSendThread; }
 
-    public InstrumentReadThread getInstrumentReaddThread() { return mInstrumentReadThread; }
-
-    public ServerSendThread getServerSendThread() { return mServerSendThread; }
-
-    public ServerReadThread getServerReadThread() { return mServerReadThread; }
+    public ServerSocketThread getServerSendThread() { return mServerSendThread; }
 }
