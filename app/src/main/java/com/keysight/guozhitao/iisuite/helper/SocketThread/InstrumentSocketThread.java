@@ -4,6 +4,10 @@ import android.os.Handler;
 
 import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+
 /**
  * Created by cn569363 on 7/23/2015.
  */
@@ -12,9 +16,20 @@ public class InstrumentSocketThread extends Thread {
     private Handler mHandler = null;
     private GlobalSettings mGlobalSettings;
 
+    private InputStream mInstrumentInputStream;
+    private OutputStream mInstrumentOutputStream;
+
+    private Socket mInstrumentSocket = null;
+
     public InstrumentSocketThread(GlobalSettings globalSettings) {
         super();
 
         mGlobalSettings = globalSettings;
+    }
+
+    public Socket getInstrumentSocket() { return mInstrumentSocket; }
+
+    public boolean isInstrumentSocketAvailable() {
+        return mInstrumentSocket != null;
     }
 }
