@@ -99,11 +99,13 @@ public class MainActivity
     private boolean mServerConnected = false;
 
     private DBService mDBService;
-    private GlobalSettings mGlobalSettings = new GlobalSettings();
+    private GlobalSettings mGlobalSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mGlobalSettings = GlobalSettings.getInstance();
 
         mDBService = new DBService(this);
         mGlobalSettings.setDBService(mDBService);

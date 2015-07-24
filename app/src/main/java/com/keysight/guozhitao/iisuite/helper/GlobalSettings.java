@@ -25,8 +25,16 @@ public class GlobalSettings implements Serializable {
     private SocketService mSocketService;
     private MessageThread mMessageThread = new MessageThread(this);
 
-    public GlobalSettings() {
+    private ServerPackageManager mServerPackageManager = null;
+
+    private GlobalSettings() {
         mSocketService = new SocketService(this);
+        mServerPackageManager = ServerPackageManager.getInstance();
+    }
+    private static final GlobalSettings mGlobalSettings = new GlobalSettings();
+
+    public static GlobalSettings getInstance() {
+        return mGlobalSettings;
     }
 
     public InstrumentInfo getCurrentInstrumentInfo() {
