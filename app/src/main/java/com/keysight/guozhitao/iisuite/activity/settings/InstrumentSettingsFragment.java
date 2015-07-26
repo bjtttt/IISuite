@@ -63,10 +63,10 @@ public class InstrumentSettingsFragment extends Fragment {
     private String mParam2;
 
     private String[] mContextmenuItems = new String[] {
-            "Copy Connection String",
-            "Modify Connection Configuration",
+            "Copy Name",
+            "Modify Configuration",
             "Delete Instrument",
-            "Delete All Instruments",
+            "Delete All",
     };
 
     private DBService mDBService;
@@ -145,10 +145,24 @@ public class InstrumentSettingsFragment extends Fragment {
                 final EditText edittxtConnection = (EditText) ll.findViewById(R.id.edittxt_connection);
                 final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_instrument_timeout);
                 etxtTimeout.setText(Integer.toString(GlobalSettings.MIN_TIMEOUT));
-                final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_instrument_connected);
-                final CheckBox chkboxLocked = (CheckBox) ll.findViewById(R.id.chkbox_locked);
+                //final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_instrument_connected);
+                //final CheckBox chkboxLocked = (CheckBox) ll.findViewById(R.id.chkbox_locked);
                 final CheckBox chkboxIDN = (CheckBox) ll.findViewById(R.id.chkbox_idn);
                 final CheckBox chkboxSCPI = (CheckBox) ll.findViewById(R.id.chkbox_scpi);
+                chkboxIDN.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(chkboxIDN.isChecked() == false)
+                            chkboxSCPI.setChecked(false);
+                    }
+                });
+                chkboxSCPI.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(chkboxSCPI.isChecked() == true)
+                            chkboxIDN.setChecked(true);
+                    }
+                });
                 Button btnIncrease = (Button) ll.findViewById(R.id.button_increase_instrument_timeout);
                 btnIncrease.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -180,8 +194,8 @@ public class InstrumentSettingsFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         final String sInstrument = edittxtConnection.getText().toString().trim();
                         final int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
-                        final boolean bConnected = chkboxConncted.isChecked();
-                        final boolean bLocked = chkboxLocked.isChecked();
+                        final boolean bConnected = true;//chkboxConncted.isChecked();
+                        final boolean bLocked = true;//chkboxLocked.isChecked();
                         final boolean bIDN = chkboxIDN.isChecked();
                         final boolean bSCPI = chkboxSCPI.isChecked();
                         if(sInstrument.isEmpty()) {
@@ -318,15 +332,15 @@ public class InstrumentSettingsFragment extends Fragment {
                 builder.setView(ll);
                 final EditText edittxtConnection = (EditText) ll.findViewById(R.id.edittxt_connection);
                 final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_instrument_timeout);
-                final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_instrument_connected);
-                final CheckBox chkboxLocked = (CheckBox) ll.findViewById(R.id.chkbox_locked);
+                //final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_instrument_connected);
+                //final CheckBox chkboxLocked = (CheckBox) ll.findViewById(R.id.chkbox_locked);
                 final CheckBox chkboxIDN = (CheckBox) ll.findViewById(R.id.chkbox_idn);
                 final CheckBox chkboxSCPI = (CheckBox) ll.findViewById(R.id.chkbox_scpi);
                 edittxtConnection.setText(ii.getConnection());
                 edittxtConnection.setEnabled(false);
                 etxtTimeout.setText(Integer.toString(ii.getTimeout()));
-                chkboxConncted.setChecked(ii.getConnected());
-                chkboxLocked.setChecked(ii.getLocked());
+                //chkboxConncted.setChecked(ii.getConnected());
+                //chkboxLocked.setChecked(ii.getLocked());
                 chkboxIDN.setChecked(ii.getIDN());
                 chkboxSCPI.setChecked(ii.getSCPI());
                 Button btnIncrease = (Button) ll.findViewById(R.id.button_increase_instrument_timeout);
@@ -359,8 +373,8 @@ public class InstrumentSettingsFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
-                        final boolean bConnected = chkboxConncted.isChecked();
-                        final boolean bLocked = chkboxLocked.isChecked();
+                        final boolean bConnected = true;//chkboxConncted.isChecked();
+                        final boolean bLocked = true;//chkboxLocked.isChecked();
                         final boolean bIDN = chkboxIDN.isChecked();
                         final boolean bSCPI = chkboxSCPI.isChecked();
                         if(iTimeout != ii.getTimeout() || bConnected != ii.getConnected() || bLocked != ii.getLocked() || bIDN != ii.getIDN() || bSCPI != ii.getSCPI()) {

@@ -72,8 +72,8 @@ public class InstrumentInfo implements Serializable {
         StringBuilder sb = new StringBuilder();
         sb.append("Timeout ");
         sb.append(getTimeout() + "s, ");
-        sb.append(getConnected()? "Connected, " : "Unconnected, ");
-        sb.append(getLocked()? "Locked, " : "Unlocked, ");
+        //sb.append(getConnected()? "Connected, " : "Unconnected, ");
+        //sb.append(getLocked()? "Locked, " : "Unlocked, ");
         sb.append(getIDN()? "Auto IDN, " : "None IDN, ");
         sb.append(getSCPI()? "Auto SCPI Tree" : "None SCPI Tree");
 

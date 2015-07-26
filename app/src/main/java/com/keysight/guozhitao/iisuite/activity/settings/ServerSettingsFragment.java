@@ -52,10 +52,10 @@ public class ServerSettingsFragment extends Fragment {
     private String mParam2;
 
     private String[] mContextmenuItems = new String[] {
-            "Copy Server String",
-            "Modify Server Configuration",
+            "Copy Name",
+            "Modify Configuration",
             "Delete Server",
-            "Delete All Servers",
+            "Delete All",
     };
 
     private DBService mDBService;
@@ -125,7 +125,7 @@ public class ServerSettingsFragment extends Fragment {
                 final EditText edittxtServer = (EditText) ll.findViewById(R.id.edittxt_server);
                 final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_server_timeout);
                 etxtTimeout.setText(Integer.toString(GlobalSettings.MIN_TIMEOUT));
-                final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_server_connected);
+                //final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_server_connected);
                 Button btnIncrease = (Button) ll.findViewById(R.id.button_increase_server_timeout);
                 btnIncrease.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -157,7 +157,7 @@ public class ServerSettingsFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         final String sServer = edittxtServer.getText().toString().trim();
                         final int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
-                        final boolean bConnected = chkboxConncted.isChecked();
+                        final boolean bConnected = true;//chkboxConncted.isChecked();
                         if(sServer.isEmpty()) {
                             AlertDialog.Builder builderEmpty = new AlertDialog.Builder(getActivity());
                             builderEmpty.setTitle("Add Server").setMessage("Cannot add empty server!")
@@ -286,11 +286,11 @@ public class ServerSettingsFragment extends Fragment {
                 builder.setView(ll);
                 final EditText edittxtServer = (EditText) ll.findViewById(R.id.edittxt_server);
                 final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_server_timeout);
-                final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_server_connected);
+                //final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_server_connected);
                 edittxtServer.setText(si.getServer());
                 etxtTimeout.setText(Integer.toString(si.getTimeout()));
                 edittxtServer.setEnabled(false);
-                chkboxConncted.setChecked(si.getConnected());
+                //chkboxConncted.setChecked(si.getConnected());
                 Button btnIncrease = (Button) ll.findViewById(R.id.button_increase_server_timeout);
                 btnIncrease.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -321,7 +321,7 @@ public class ServerSettingsFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
-                        final boolean bConnected = chkboxConncted.isChecked();
+                        final boolean bConnected = true;//chkboxConncted.isChecked();
                         if(iTimeout != si.getTimeout() || bConnected != si.getConnected()) {
                             si.setTimeout(iTimeout);
                             si.setConnected(bConnected);

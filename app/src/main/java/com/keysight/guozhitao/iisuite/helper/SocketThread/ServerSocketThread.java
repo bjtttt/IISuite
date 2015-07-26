@@ -9,13 +9,14 @@ import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 
 /**
  * Created by cn569363 on 7/23/2015.
  */
-public class ServerSocketThread extends Thread {
+public class ServerSocketThread extends Thread implements Serializable {
 
     public final static int OPEN_SERVER = 0x00;
     public final static int CLOSE_SERVER = 0x01;

@@ -6,12 +6,13 @@ import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.Socket;
 
 /**
  * Created by cn569363 on 7/23/2015.
  */
-public class InstrumentSocketThread extends Thread {
+public class InstrumentSocketThread extends Thread implements Serializable {
 
     private Handler mHandler = null;
     private GlobalSettings mGlobalSettings;
