@@ -111,8 +111,7 @@ public class MainActivity
         mGlobalSettings.setDBService(mDBService);
         Cursor c = mDBService.rawQuery("SELECT * FROM iis_instr ORDER BY connection", null);
         c.moveToFirst();
-        boolean bFindLocalShort = false;
-        boolean bFindLocalLong = false;
+        boolean bFindLocal = false;
         while (c.isAfterLast() == false) {
             InstrumentInfo ii = new InstrumentInfo();
             ii.setConnection(c.getString(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_CONNECTION])));
@@ -123,31 +122,22 @@ public class MainActivity
             ii.setLocked(c.getInt(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_LOCKED])) == 1);
             mGlobalSettings.getInstrumentInfoList().add(ii);
 
-            if(ii.getConnection().trim().compareToIgnoreCase("TCPIP0::localhost::INSTR") == 0)
-                bFindLocalShort = true;
-            if(ii.getConnection().trim().compareToIgnoreCase("TCPIP0::localhost::inst0::INSTR") == 0)
-                bFindLocalLong = true;
+            if(ii.getConnection().trim().compareToIgnoreCase("localhost") == 0)
+                bFindLocal = true;
 
             c.moveToNext();
         }
-        if(bFindLocalLong == false) {
+        if(bFindLocal == false) {
             InstrumentInfo ii = new InstrumentInfo();
-            ii.setConnection("TCPIP0::localhost::inst0::INSTR");
+            ii.setConnection("localhost");
             ii.setConnected(true);
             mGlobalSettings.getInstrumentInfoList().add(0, ii);
-            mDBService.execSQL("INSERT INTO iis_instr ( connection, timeout, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::inst0::INSTR', 5, 0, 0, 1, 0 )");
-        }
-        if(bFindLocalShort == false) {
-            InstrumentInfo ii = new InstrumentInfo();
-            ii.setConnection("TCPIP0::localhost::INSTR");
-            ii.setConnected(true);
-            mGlobalSettings.getInstrumentInfoList().add(0, ii);
-            mDBService.execSQL("INSERT INTO iis_instr ( connection, timeout, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::INSTR', 5, 0, 0, 1, 0 )");
+            mDBService.execSQL("INSERT INTO iis_instr ( connection, timeout, idn, scpitree, connected, locked ) VALUES ( 'localhost', 5, 0, 0, 1, 0 )");
         }
 
         c = mDBService.rawQuery("SELECT * FROM iis_server ORDER BY server", null);
         c.moveToFirst();
-        boolean bFindLocal = false;
+        bFindLocal = false;
         while (c.isAfterLast() == false) {
             ServerInfo si = new ServerInfo();
             si.setServer(c.getString(c.getColumnIndex(mServerDBColNames[DB_SERVER_COL_SERVER])));

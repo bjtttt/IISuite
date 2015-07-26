@@ -10,7 +10,7 @@
         android:layout_height="40dp">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:text="@string/server"
             android:id="@+id/txtv_server" />
@@ -27,15 +27,15 @@
         android:layout_height="40dp">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:text="@string/timeout"
             android:id="@+id/txtv_server_timeout" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:background="@drawable/minus"
             android:id="@+id/button_decrease_server_timeout"
             android:layout_gravity="center" />
@@ -46,22 +46,23 @@
             android:inputType="number"
             android:ems="10"
             android:id="@+id/etxt_server_timeout"
-            android:gravity="center_vertical|center_horizontal" />
+            android:gravity="center_vertical|center_horizontal"
+            android:text="5" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:background="@drawable/plus"
             android:id="@+id/button_increase_server_timeout"
             android:layout_gravity="center" />
 
     </LinearLayout>
 
-    <LinearLayout
+    <!--LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"-->
 
         <!--CheckBox
             android:layout_width="wrap_content"
@@ -75,16 +76,16 @@
             android:text="@string/scpi_tree"
             android:id="@+id/chkbox_scpi" /-->
 
-        <CheckBox
-            android:layout_width="wrap_content"
+        <!--CheckBox
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:text="@string/connected"
-            android:id="@+id/chkbox_server_connected" />
+            android:id="@+id/chkbox_server_connected" /-->
 
         <!--CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/locked"
             android:id="@+id/chkbox_locked" /-->
-        </LinearLayout>
+        <!--/LinearLayout-->
 </LinearLayout>
