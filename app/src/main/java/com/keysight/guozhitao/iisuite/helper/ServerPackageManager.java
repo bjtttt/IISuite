@@ -13,15 +13,41 @@ import java.util.ListIterator;
 
 /*
 
-Server :
+To Server :
 Socket Package Definition :
 INDEX       : 2 bytes
-PROPERTY    : 1 byte
-              bit7 ~ bit2 : reserved
-              bit1 : message type
-                     0 - pulse
-                     1 - data
-              bit0 : 1 - multiple, 0 - single
+PROPERTY    : 2 bytes
+              bit15 : message type
+                      0 - pulse
+                      1 - data
+              bit14 : 1 - multiple, 0 - single
+              bit7 ~ bit0 : valid only when bit15 is 1
+                             0 - SyncInstrumentFromServer
+                             1 - SyncInstrumentToServer
+                             2 - SyncInstrumentMergeServer
+                             3 - SyncServerFromServer
+                             4 - SyncServerToServer
+                             5 - SyncServerMergeServer
+PACKAGE     : 4 bytes
+              bit31 ~ bit16 : total
+              bit15 ~ bit0  : index
+DATA LENGTH : 2 bytes
+DATA        : 0 ~ 502 bytes
+CRC         : 1 byte
+
+From Server :
+Socket Package Definition :
+INDEX       : 2 bytes
+RERPONSE INDEX  : 2 bytes
+PROPERTY    : 2 bytes
+              bit15 : 1 - multiple, 0 - single
+              bit7 ~ bit0 : valid only when bit15 is 1
+                             0 - OK/ACK
+                             1 - Error : CRC
+                             2 - Error : Data Length
+                             3 - Error : Message Type
+                             4 - Error : Package Number
+                             5 - Error :
 PACKAGE     : 4 bytes
               bit31 ~ bit16 : total
               bit15 ~ bit0  : index
@@ -36,13 +62,29 @@ CRC         : 1 byte
  */
 public class ServerPackageManager implements Serializable {
 
-    public enum MessageType {
+    public enum MessageCategory {
         Pulse,
         Data
     }
 
+    public enum MessageType {
+        SyncInstrumentFromServer,
+        SyncInstrumentToServer,
+        SyncInstrumentMergeServer,
+        SyncServerFromServer,
+        SyncServerToServer,
+        SyncServerMergeServer
+    }
+
+    public enum ResponseType {
+        Pulse,
+        Error,
+
+    }
+
     private final static int MAX_MESSAGE_INDEX = 65535;
-    private final static int MAX_MESSAGE_INFORMATION_LENGTH = 10;
+    private final static int MAX_MESSAGE_INFORMATION_LENGTH = 11;
+    private final static int MAX_MESSAGE_RESPONSE_LENGTH = 13;
     private final static int MAX_MESSAGE_BODY_LENGTH = 502;
 
     private static int mMessageIndex = 0;
@@ -56,21 +98,21 @@ public class ServerPackageManager implements Serializable {
         return mServerPackageManager;
     }
 
-    public ArrayList<byte[]> getMessages(MessageType msgType, String s) {
+    public ArrayList<byte[]> getMessages(MessageCategory msgCat, MessageType msgType, String s) {
         if (s == null || s.length() < 1)
-            return getMessages(msgType, new byte[]{});
+            return getMessages(msgCat, msgType, new byte[]{});
         else {
             try {
                 byte[] bs = s.getBytes("UTF-8");
-                return getMessages(msgType, bs);
+                return getMessages(msgCat, msgType, bs);
             } catch (UnsupportedEncodingException e) {
                 byte[] bs = s.getBytes();
-                return getMessages(msgType, bs);
+                return getMessages(msgCat, msgType, bs);
             }
         }
     }
 
-    public ArrayList<byte[]> getMessages(MessageType msgType, byte[] ba) {
+    public ArrayList<byte[]> getMessages(MessageCategory msgCat, MessageType msgType, byte[] ba) {
         if (ba == null)
             ba = new byte[]{};
 
@@ -84,7 +126,7 @@ public class ServerPackageManager implements Serializable {
         ArrayList<byte[]> messageList = new ArrayList<>();
 
         for (byte[] baItem : msgList) {
-            messageList.add(getMessage(msgType, baItem, messageCount, messageIndex++));
+            messageList.add(getMessage(msgCat, msgType, baItem, messageCount, messageIndex++));
         }
 
         return messageList;
@@ -115,9 +157,9 @@ public class ServerPackageManager implements Serializable {
         return messageList;
     }
 
-    private byte[] getMessage(MessageType msgType, byte[] ba, int totalPackage, int indexPackage) {
-        if (mMessageIndex > MAX_MESSAGE_INDEX || mMessageIndex < 0)
-            mMessageIndex = 0;
+    private byte[] getMessage(MessageCategory msgCat, MessageType msgType, byte[] ba, int totalPackage, int indexPackage) {
+        if (mMessageIndex > MAX_MESSAGE_INDEX || mMessageIndex < 1)
+            mMessageIndex = 1;
 
         int msgLen = ba.length;
         int totalLen = MAX_MESSAGE_INFORMATION_LENGTH + msgLen;
@@ -125,23 +167,46 @@ public class ServerPackageManager implements Serializable {
 
         baFinal[0] = (byte) ((mMessageIndex >> 8) & 0xF);
         baFinal[1] = (byte) (mMessageIndex & 0xF);
-        if (msgType == MessageType.Pulse)
+        if (msgCat == MessageCategory.Pulse)
             baFinal[2] = (byte) 0;
         else
-            baFinal[2] = (byte) 2;
+            baFinal[2] = (byte) 8;
         if (totalPackage > 1)
-            baFinal[2] = (byte) (baFinal[2] | 0x1);
+            baFinal[2] = (byte) (baFinal[2] | 0x4);
 
-        baFinal[3] = (byte) ((totalPackage >> 8) & 0xF);
-        baFinal[4] = (byte) (totalPackage & 0xF);
-        baFinal[5] = (byte) ((indexPackage >> 8) & 0xF);
-        baFinal[6] = (byte) (indexPackage & 0xF);
+        switch(msgType) {
+            default:
+                throw new IllegalArgumentException("ServerPackageManager::getMessage : Wrong message type - " + msgType.toString());
+            case SyncInstrumentFromServer:
+                baFinal[3] = (byte) 0;
+                break;
+            case SyncInstrumentToServer:
+                baFinal[3] = (byte) 1;
+                break;
+            case SyncInstrumentMergeServer:
+                baFinal[3] = (byte) 2;
+                break;
+            case SyncServerFromServer:
+                baFinal[3] = (byte) 3;
+                break;
+            case SyncServerToServer:
+                baFinal[3] = (byte) 4;
+                break;
+            case SyncServerMergeServer:
+                baFinal[3] = (byte) 5;
+                break;
+        }
 
-        baFinal[7] = (byte) ((msgLen >> 8) & 0xF);
-        baFinal[8] = (byte) (msgLen & 0xF);
+        baFinal[4] = (byte) ((totalPackage >> 8) & 0xF);
+        baFinal[5] = (byte) (totalPackage & 0xF);
+        baFinal[6] = (byte) ((indexPackage >> 8) & 0xF);
+        baFinal[7] = (byte) (indexPackage & 0xF);
 
-        for (int i = 9; i < 9 + msgLen; i++) {
-            baFinal[i] = ba[i - 9];
+        baFinal[8] = (byte) ((msgLen >> 8) & 0xF);
+        baFinal[9] = (byte) (msgLen & 0xF);
+
+        for (int i = 10; i < 10 + msgLen; i++) {
+            baFinal[i] = ba[i - 10];
         }
 
         byte byteXOR = (byte) 0;
