@@ -1,6 +1,8 @@
 package com.keysight.guozhitao.iisuite.helper.SocketThread;
 
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 
 import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
 
@@ -32,5 +34,19 @@ public class InstrumentSocketThread extends Thread implements Serializable {
 
     public boolean isInstrumentSocketAvailable() {
         return mInstrumentSocket != null;
+    }
+
+    public void run() {
+        Looper.prepare();
+        mHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch(msg.what) {
+                    default:
+                        break;
+                }
+            }
+        };
+        Looper.loop();
     }
 }
