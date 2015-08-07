@@ -41,6 +41,7 @@ public class InstrumentSocketThread extends Thread implements Serializable {
         mHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
+                byte[] ba = null;
                 switch(msg.what) {
                     default:
                         break;
