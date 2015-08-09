@@ -82,10 +82,10 @@ public class ServerPackageManager implements Serializable {
 
     }
 
-    private final static int MAX_MESSAGE_INDEX = 65535;
-    private final static int MAX_MESSAGE_INFORMATION_LENGTH = 11;
-    private final static int MAX_MESSAGE_RESPONSE_LENGTH = 13;
-    private final static int MAX_MESSAGE_BODY_LENGTH = 502;
+    public final static int MAX_MESSAGE_INDEX = 65535;
+    public final static int MAX_MESSAGE_INFORMATION_LENGTH = 11;
+    public final static int MAX_MESSAGE_RESPONSE_LENGTH = 13;
+    public final static int MAX_MESSAGE_BODY_LENGTH = 502;
 
     private static int mMessageIndex = 0;
 
@@ -226,4 +226,6 @@ public class ServerPackageManager implements Serializable {
 
         return baFinal;
     }
+
+    //private
 }

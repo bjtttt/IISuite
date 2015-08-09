@@ -26,6 +26,7 @@ import com.keysight.guozhitao.iisuite.helper.DBService;
 import com.keysight.guozhitao.iisuite.helper.InstrumentInfo;
 import com.keysight.guozhitao.iisuite.helper.ServerInfo;
 import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
+import com.keysight.guozhitao.iisuite.helper.SocketService;
 
 import java.util.ArrayList;
 import java.util.List;
