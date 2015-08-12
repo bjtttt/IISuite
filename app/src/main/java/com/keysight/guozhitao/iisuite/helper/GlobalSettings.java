@@ -25,11 +25,16 @@ public class GlobalSettings implements Serializable {
     private SocketService mSocketService;
     private MessageThread mMessageThread = new MessageThread(this);
 
+    private LogService mLogService;
+
     private ServerPackageManager mServerPackageManager = null;
 
     private GlobalSettings() {
-        mSocketService = new SocketService(this);
         mServerPackageManager = ServerPackageManager.getInstance();
+        mServerPackageManager.setGlobalSettings(this);
+
+        mSocketService = new SocketService(this);
+        mLogService = new LogService(this);
     }
     private static final GlobalSettings mGlobalSettings = new GlobalSettings();
 
@@ -156,7 +161,7 @@ public class GlobalSettings implements Serializable {
 
     public MessageThread getMessageThread() { return mMessageThread; }
 
-    //public void setSocketService(SocketService socketService) { mSocketService = socketService; }
-
     public SocketService getSocketService() { return mSocketService; }
+
+    public LogService getLogService() { return mLogService; }
 }

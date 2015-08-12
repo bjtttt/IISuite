@@ -16,18 +16,13 @@ import java.util.ListIterator;
 To Server :
 Socket Package Definition :
 INDEX       : 2 bytes
+              Min - 1, Max - 32767
 PROPERTY    : 2 bytes
               bit15 : message type
                       0 - pulse
                       1 - data
               bit14 : 1 - multiple, 0 - single
-              bit7 ~ bit0 : valid only when bit15 is 1
-                             0 - SyncInstrumentFromServer
-                             1 - SyncInstrumentToServer
-                             2 - SyncInstrumentMergeServer
-                             3 - SyncServerFromServer
-                             4 - SyncServerToServer
-                             5 - SyncServerMergeServer
+              bit7 ~ bit0 : MessagePackageInfo.MessagePackageType
 PACKAGE     : 4 bytes
               bit31 ~ bit16 : total
               bit15 ~ bit0  : index
@@ -37,12 +32,14 @@ CRC         : 1 byte
 
 From Server :
 Socket Package Definition :
-INDEX       : 2 bytes
+INDEX           : 2 bytes
+                  Min - 1, Max - 32767
 RERPONSE INDEX  : 2 bytes
-PROPERTY    : 2 bytes
-              bit15 : 1 - multiple, 0 - single
-              bit7 ~ bit0 : valid only when bit15 is 1
-                             0 - OK/ACK
+                  Min - 1, Max - 32767
+PROPERTY        : 2 bytes
+                  bit15 : 1 - multiple, 0 - single
+                  bit7 ~ bit0 : valid only when bit15 is 1
+                             0 - OK/ACK/DATA
                              1 - Error : CRC
                              2 - Error : Data Length
                              3 - Error : Message Type
@@ -62,32 +59,16 @@ CRC         : 1 byte
  */
 public class ServerPackageManager implements Serializable {
 
-    public enum MessageCategory {
-        Pulse,
-        Data
-    }
-
-    public enum MessageType {
-        SyncInstrumentFromServer,
-        SyncInstrumentToServer,
-        SyncInstrumentMergeServer,
-        SyncServerFromServer,
-        SyncServerToServer,
-        SyncServerMergeServer
-    }
-
-    public enum ResponseType {
-        Pulse,
-        Error,
-
-    }
-
-    public final static int MAX_MESSAGE_INDEX = 65535;
-    public final static int MAX_MESSAGE_INFORMATION_LENGTH = 11;
-    public final static int MAX_MESSAGE_RESPONSE_LENGTH = 13;
+    public final static int MAX_MESSAGE_INDEX = 32767;  // 0x7FFF
+    public final static int MESSAGE_INFORMATION_LENGTH = 11;
+    public final static int MESSAGE_RESPONSE_LENGTH = 13;
     public final static int MAX_MESSAGE_BODY_LENGTH = 502;
 
     private static int mMessageIndex = 0;
+    private static int mResponseIndex = 0;
+
+    private LogService mLogService;
+    private GlobalSettings mGlobalSettings;
 
     private ServerPackageManager() {
     }
@@ -96,6 +77,11 @@ public class ServerPackageManager implements Serializable {
 
     public static ServerPackageManager getInstance() {
         return mServerPackageManager;
+    }
+
+    public void setGlobalSettings(GlobalSettings gs) {
+        mGlobalSettings = gs;
+        mLogService = gs.getLogService();
     }
 
     public ArrayList<byte[]> getMessages(MessageCategory msgCat, MessageType msgType, String s) {
@@ -162,7 +148,7 @@ public class ServerPackageManager implements Serializable {
             mMessageIndex = 1;
 
         int msgLen = ba.length;
-        int totalLen = MAX_MESSAGE_INFORMATION_LENGTH + msgLen;
+        int totalLen = MESSAGE_INFORMATION_LENGTH + msgLen;
         byte[] baFinal = new byte[totalLen];
 
         baFinal[0] = (byte) ((mMessageIndex >> 8) & 0xF);
@@ -227,5 +213,75 @@ public class ServerPackageManager implements Serializable {
         return baFinal;
     }
 
-    //private
+    public ResponsePackageInfo.ResponseType parseResponsePackage(byte[] ba) {
+        if(ba == null || ba.length < MESSAGE_RESPONSE_LENGTH)
+            return ResponseType.INVALID_RESPONSE;
+
+        int dataLen = ba.length - MESSAGE_RESPONSE_LENGTH;
+        byte[] baResponse = new byte[dataLen];
+
+        int index = (int)ba[0] << 8 | (int)ba[1];
+        if(index < 1 || index > MAX_MESSAGE_INDEX){
+            mLogService.Log(LogService.LogType.ERROR, "Server Response : INDEX ERROR " + String.valueOf(index));
+            return ResponseType.ERROR_INDEX;
+        }
+        else
+            mLogService.Log(LogService.LogType.INFORMATION, "Server Response : INDEX " + String.valueOf(index));
+        int respIndex = (int)ba[2] << 8 | (int)ba[3];
+        if(index < 1 || index > MAX_MESSAGE_INDEX){
+            mLogService.Log(LogService.LogType.ERROR, "Server Response : RESPONSE INDEX ERROR " + String.valueOf(respIndex));
+            return ResponseType.ERROR_RESP_INDEX;
+        }
+        else
+            mLogService.Log(LogService.LogType.INFORMATION, "Server Response : RESPONSE INDEX " + String.valueOf(respIndex));
+
+        boolean isMultiple = ((int)ba[4] & 0x8) == 0x8;
+
+        int respType = ((int)ba[4] & 0x7) << 8 | (int)ba[5];
+
+
+        int packageTotal = (int)ba[6] << 8 | (int)ba[7];
+        if(isMultiple == false && packageTotal != 0) {
+            mLogService.Log(LogService.LogType.ERROR, "Server Response : MULTIPLE ERROR" + String.valueOf(packageTotal));
+            return ResponseType.ERROR_PACK_TOTAL;
+        }
+        if(packageTotal < 1 || packageTotal > MAX_MESSAGE_INDEX){
+            mLogService.Log(LogService.LogType.ERROR, "Server Response : PACKAGE TOTAL ERROR" + String.valueOf(packageTotal));
+            return ResponseType.ERROR_PACK_TOTAL;
+        }
+        else
+            mLogService.Log(LogService.LogType.INFORMATION, "Server Response : PACKAGE TOTAL " + String.valueOf(packageTotal));
+        int packageIndex = (int)ba[8] << 8 | (int)ba[9];
+        if(packageIndex < 1 || packageIndex > packageTotal){
+            mLogService.Log(LogService.LogType.ERROR, "Server Response : PACKAGE INDEX ERROR" + String.valueOf(packageIndex));
+            return ResponseType.ERROR_PACK_INDEX;
+        }
+        else
+            mLogService.Log(LogService.LogType.INFORMATION, "Server Response : PACKAGE INDEX " + String.valueOf(index));
+        int len = (int)ba[10] << 8 | (int)ba[11];
+        if(len < 0 || len > MAX_MESSAGE_BODY_LENGTH) {
+            mLogService.Log(LogService.LogType.ERROR, "Server Response : LENGTH ERROR" + String.valueOf(len));
+            return ResponseType.ERROR_LEN;
+        }
+        if(len != dataLen) {
+            mLogService.Log(LogService.LogType.ERROR, "Server Response : LENGTH MISMATCH ERROR - LEN " + String.valueOf(len) + " V.S. DATA LEN " + String.valueOf(dataLen));
+            return ResponseType.ERROR_LEN_MISMATCH;
+        }
+        mLogService.Log(LogService.LogType.INFORMATION, "Server Response : LEN " + String.valueOf(len));
+
+        byte crc = (byte)0;
+        for(int i=0; i<len; i++) {
+            if(i == 0)
+                crc = ba[i+11];
+            baResponse[i] = ba[i + 11];
+        }
+        if(crc != ba[ba.length -1]) {
+            mLogService.Log(LogService.LogType.ERROR, "Server Response : CRC ERROR - CALC CRC " + String.valueOf(crc) + " V.S. CRC " + String.valueOf(ba[ba.length -1]));
+            return ResponseType.ERROR_CRC;
+        }
+        else
+            mLogService.Log(LogService.LogType.INFORMATION, "Server Response : CRC " + String.valueOf(crc));
+
+        return ResponseType.ACK_DATA;
+    }
 }
