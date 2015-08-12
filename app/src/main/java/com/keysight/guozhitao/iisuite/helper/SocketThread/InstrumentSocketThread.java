@@ -1,4 +1,4 @@
-package com.keysight.guozhitao.iisuite.helper.SocketThread;
+package com.keysight.guozhitao.iisuite.helper.socketthread;
 
 import android.os.Handler;
 import android.os.Looper;
