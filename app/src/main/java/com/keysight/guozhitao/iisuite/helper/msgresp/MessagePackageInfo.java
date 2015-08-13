@@ -9,6 +9,7 @@ public class MessagePackageInfo implements Serializable {
 
     public enum MessagePackageType {
         Pulse,
+        ServerFeedback,
         SyncInstrumentFromServer,
         SyncInstrumentToServer,
         SyncInstrumentMergeServer,
@@ -22,7 +23,7 @@ public class MessagePackageInfo implements Serializable {
     The message is sent to server, so the server will check the message and report the status.
      */
     public enum MessageCheckType {
-        PULSE_DATA,
+        ACK,
         ERROR_INDEX,
         ERROR_RESERVED,
         ERROR_MULTIPLE,
