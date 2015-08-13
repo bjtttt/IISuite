@@ -28,7 +28,6 @@ public class ResponsePackageInfo implements Serializable {
     private int mPackageTotal = 0;
     private int mPackageIndex = 0;
     private int mLen = 0;
-    private byte[] mData = null;
     private byte mCRC = (byte)0;
 
     private byte[] mSource;
@@ -113,12 +112,15 @@ public class ResponsePackageInfo implements Serializable {
         return mLen;
     }
 
-    public void setData(byte[] ba) {
-        mData = ba;
-    }
-
     public byte[] getData() {
-        return mData;
+        if(mSource == null)
+            return null;
+
+        byte[] ba = new byte[mLen];
+        for (int i = 0; i < mLen; i++) {
+            ba[i] = mSource[i + 22];
+        }
+        return ba;
     }
 
     public void setCRC (byte crc) {

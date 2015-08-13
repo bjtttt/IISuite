@@ -80,11 +80,11 @@ public class ServerPackageManager implements Serializable {
         mLogService = gs.getLogService();
     }
 
-    public ArrayList<byte[]> composeMsgs(MessagePackageInfo.MessagePackageType msgPackageType) {
+    public ArrayList<MessagePackageInfo> composeMsgs(MessagePackageInfo.MessagePackageType msgPackageType) {
         return composeMsgs(msgPackageType, new byte[]{});
     }
 
-    public ArrayList<byte[]> composeMsgs(MessagePackageInfo.MessagePackageType msgPackageType, String s) {
+    public ArrayList<MessagePackageInfo> composeMsgs(MessagePackageInfo.MessagePackageType msgPackageType, String s) {
         if (s == null || s.length() < 1)
             return composeMsgs(msgPackageType, new byte[]{});
         else {
@@ -98,7 +98,7 @@ public class ServerPackageManager implements Serializable {
         }
     }
 
-    public ArrayList<byte[]> composeMsgs(MessagePackageInfo.MessagePackageType msgPackageType, byte[] ba) {
+    public ArrayList<MessagePackageInfo> composeMsgs(MessagePackageInfo.MessagePackageType msgPackageType, byte[] ba) {
         if (ba == null)
             ba = new byte[]{};
 
@@ -109,7 +109,7 @@ public class ServerPackageManager implements Serializable {
             messageCount = (messageLen - (messageLen % MAX_MESSAGE_BODY_LENGTH)) / MAX_MESSAGE_BODY_LENGTH;
 
         ArrayList<byte[]> msgList = splitMessage(ba);
-        ArrayList<byte[]> messageList = new ArrayList<>();
+        ArrayList<MessagePackageInfo> messageList = new ArrayList<>();
 
         for (byte[] baItem : msgList) {
             messageList.add(composeMsg(msgPackageType, baItem, messageCount, messageIndex++));
@@ -143,11 +143,9 @@ public class ServerPackageManager implements Serializable {
         return messageList;
     }
 
-    public byte[] composePulse() {
-        return composeMsg(MessagePackageInfo.MessagePackageType.Pulse, null, 0, 0);
-    }
+    private MessagePackageInfo composeMsg(MessagePackageInfo.MessagePackageType msgPackageType, byte[] ba, int totalPackage, int indexPackage) {
+        MessagePackageInfo mpi = new MessagePackageInfo();
 
-    private byte[] composeMsg(MessagePackageInfo.MessagePackageType msgPackageType, byte[] ba, int totalPackage, int indexPackage) {
         if (mMessageIndex > MAX_MESSAGE_INDEX || mMessageIndex < 1)
             mMessageIndex = 1;
 
@@ -156,6 +154,7 @@ public class ServerPackageManager implements Serializable {
             msgLen = 0;
         else
             msgLen = ba.length;
+
         int totalLen = MESSAGE_INFORMATION_LENGTH + msgLen;
         byte[] baFinal = new byte[totalLen];
 
@@ -163,29 +162,40 @@ public class ServerPackageManager implements Serializable {
         baFinal[1] = (byte) ((mMessageIndex >> 16) & 0xFF);
         baFinal[2] = (byte) ((mMessageIndex >> 8) & 0xFF);
         baFinal[3] = (byte) (mMessageIndex & 0xFF);
+        mpi.setIndex(mMessageIndex);
+
         baFinal[4] = (byte)0;
         baFinal[5] = (byte)0;
 
         baFinal[6] = (byte) ((msgPackageType.ordinal() >> 8) & 0x7F);
         baFinal[7] = (byte) (msgPackageType.ordinal() & 0xFF);
+        mpi.setMsgPackageType(msgPackageType);
         if(msgPackageType != MessagePackageInfo.MessagePackageType.Pulse) {
             if (totalPackage > 1) {
                 baFinal[6] = (byte) (baFinal[6] | 0x8);
+                mpi.setIsMultiple(true);
 
                 baFinal[8] = (byte) ((totalPackage >> 24) & 0xFF);
                 baFinal[9] = (byte) ((totalPackage >> 16) & 0xFF);
                 baFinal[10] = (byte) ((totalPackage >> 8) & 0xFF);
                 baFinal[11] = (byte) (totalPackage & 0xFF);
+                mpi.setPackageTotal(totalPackage);
 
                 baFinal[12] = (byte) ((indexPackage >> 24) & 0xFF);
                 baFinal[13] = (byte) ((indexPackage >> 16) & 0xFF);
                 baFinal[14] = (byte) ((indexPackage >> 8) & 0xFF);
                 baFinal[15] = (byte) (indexPackage & 0xFF);
+                mpi.setPackageIndex(indexPackage);
             }
+            else
+                mpi.setIsMultiple(false);
         }
+        else
+            mpi.setIsMultiple(false);
 
         baFinal[16] = (byte) ((msgLen >> 8) & 0xFF);
         baFinal[17] = (byte) (msgLen & 0xFF);
+        mpi.setLen(msgLen);
 
         byte crc = (byte) 0;
         for (int i = 0; i < msgLen; i++) {
@@ -193,8 +203,12 @@ public class ServerPackageManager implements Serializable {
             baFinal[i + 18] = ba[i];
         }
         baFinal[baFinal.length - 1] = crc;
+        mpi.setCRC(crc);
+        mpi.setSource(baFinal);
 
-        return baFinal;
+        mMessageIndex++;
+
+        return mpi;
     }
 
     /*
@@ -294,7 +308,6 @@ public class ServerPackageManager implements Serializable {
             return rpi;
         }
         mLogService.Log(LogService.LogType.INFORMATION, "Server Response : CRC " + String.valueOf(crc));
-        rpi.setData(baResponse);
         rpi.setCRC(crc);
 
         rpi.setResponseCheckType(ResponsePackageInfo.ResponseCheckType.OK);

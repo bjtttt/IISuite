@@ -10,7 +10,7 @@ import java.io.Serializable;
 public class ServerInfo implements Serializable {
     private String mServer = "";
     private int mTimeout = GlobalSettings.MIN_TIMEOUT;
-    private boolean mConnected = true;
+    private boolean mAutoConnection = true;
 
     public ServerInfo() {
     }
@@ -35,19 +35,19 @@ public class ServerInfo implements Serializable {
         return mTimeout;
     }
 
-    public boolean getConnected() {
-        return mConnected;
+    public boolean getAutoConnection() {
+        return mAutoConnection;
     }
 
-    public void setConnected(boolean b) {
-        mConnected = b;
+    public void setAutoConnection(boolean b) {
+        mAutoConnection = b;
     }
 
     public String getServerConfiguration() {
         StringBuilder sb = new StringBuilder();
         sb.append("Timeout ");
-        sb.append(getTimeout() + "s");//, ");
-        //sb.append(getConnected()? "Connected" : "Unconnected");
+        sb.append(getTimeout() + "s, ");
+        sb.append(getAutoConnection()? "Auto Connection" : "Mannual Connection");
 
         return sb.toString();
     }

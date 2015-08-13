@@ -1,5 +1,7 @@
 package com.keysight.guozhitao.iisuite.helper;
 
+import com.keysight.guozhitao.iisuite.helper.msgresp.MessagePackageInfo;
+import com.keysight.guozhitao.iisuite.helper.msgresp.ResponsePackageInfo;
 import com.keysight.guozhitao.iisuite.helper.msgresp.ServerPackageManager;
 
 import java.io.Serializable;
@@ -31,6 +33,9 @@ public class GlobalSettings implements Serializable {
 
     private ServerPackageManager mServerPackageManager = null;
 
+    private ArrayList<MessagePackageInfo> mMsgPackageInfoSentArray = new ArrayList<MessagePackageInfo>();
+    private ArrayList<ResponsePackageInfo> mRespPackageInfoSentArray = new ArrayList<ResponsePackageInfo>();
+
     private GlobalSettings() {
         mServerPackageManager = ServerPackageManager.getInstance();
         mServerPackageManager.setGlobalSettings(this);
@@ -38,10 +43,23 @@ public class GlobalSettings implements Serializable {
         mSocketService = new SocketService(this);
         mLogService = new LogService(this);
     }
+
     private static final GlobalSettings mGlobalSettings = new GlobalSettings();
 
     public static GlobalSettings getInstance() {
         return mGlobalSettings;
+    }
+
+    public ServerPackageManager getServerPackageManager() {
+        return mServerPackageManager;
+    }
+
+    public ArrayList<MessagePackageInfo> getMessagePackageInfoSentArray() {
+        return mMsgPackageInfoSentArray;
+    }
+
+    public ArrayList<ResponsePackageInfo> getResponsePackageInfoSentArray() {
+        return mRespPackageInfoSentArray;
     }
 
     public InstrumentInfo getCurrentInstrumentInfo() {
