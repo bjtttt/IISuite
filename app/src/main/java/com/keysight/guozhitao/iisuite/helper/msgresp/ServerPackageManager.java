@@ -59,10 +59,9 @@ public class ServerPackageManager implements Serializable {
     public final static int MAX_MESSAGE_INDEX = Integer.MAX_VALUE;  // 0x7FFF
     public final static int MESSAGE_INFORMATION_LENGTH = 19;
     public final static int MESSAGE_RESPONSE_LENGTH = 23;
-    public final static int MAX_MESSAGE_BODY_LENGTH = 502;
+    public final static int MAX_MESSAGE_BODY_LENGTH = 4096;
 
     private static int mMessageIndex = 0;
-    private static int mResponseIndex = 0;
 
     private LogService mLogService;
     private GlobalSettings mGlobalSettings;
@@ -152,7 +151,11 @@ public class ServerPackageManager implements Serializable {
         if (mMessageIndex > MAX_MESSAGE_INDEX || mMessageIndex < 1)
             mMessageIndex = 1;
 
-        int msgLen = ba.length;
+        int msgLen = 0;
+        if(ba == null)
+            msgLen = 0;
+        else
+            msgLen = ba.length;
         int totalLen = MESSAGE_INFORMATION_LENGTH + msgLen;
         byte[] baFinal = new byte[totalLen];
 
@@ -162,137 +165,139 @@ public class ServerPackageManager implements Serializable {
         baFinal[3] = (byte) (mMessageIndex & 0xFF);
         baFinal[4] = (byte)0;
         baFinal[5] = (byte)0;
-        if (msgPackageType == MessagePackageInfo.MessagePackageType.Pulse)
-            baFinal[6] = (byte) 0;
-        else
-            baFinal[6] = (byte) 8;
-        baFinal[6] = (byte) (baFinal[6] | ((msgPackageType.ordinal() >> 8) & 0x7F));
+
+        baFinal[6] = (byte) ((msgPackageType.ordinal() >> 8) & 0x7F);
         baFinal[7] = (byte) (msgPackageType.ordinal() & 0xFF);
-        if (totalPackage > 1)
-            baFinal[6] = (byte) (baFinal[6] | 0x8);
+        if(msgPackageType != MessagePackageInfo.MessagePackageType.Pulse) {
+            if (totalPackage > 1) {
+                baFinal[6] = (byte) (baFinal[6] | 0x8);
 
-        switch(msgPackageType) {
-            default:
-            case Pulse:
-            case SyncInstrumentFromServer:
-                baFinal[3] = (byte) 0;
-                break;
-            case SyncInstrumentToServer:
-                baFinal[3] = (byte) 1;
-                break;
-            case SyncInstrumentMergeServer:
-                baFinal[3] = (byte) 2;
-                break;
-            case SyncServerFromServer:
-                baFinal[3] = (byte) 3;
-                break;
-            case SyncServerToServer:
-                baFinal[3] = (byte) 4;
-                break;
-            case SyncServerMergeServer:
-                baFinal[3] = (byte) 5;
-                break;
-        }
+                baFinal[8] = (byte) ((totalPackage >> 24) & 0xFF);
+                baFinal[9] = (byte) ((totalPackage >> 16) & 0xFF);
+                baFinal[10] = (byte) ((totalPackage >> 8) & 0xFF);
+                baFinal[11] = (byte) (totalPackage & 0xFF);
 
-        baFinal[4] = (byte) ((totalPackage >> 8) & 0xF);
-        baFinal[5] = (byte) (totalPackage & 0xF);
-        baFinal[6] = (byte) ((indexPackage >> 8) & 0xF);
-        baFinal[7] = (byte) (indexPackage & 0xF);
-
-        baFinal[8] = (byte) ((msgLen >> 8) & 0xF);
-        baFinal[9] = (byte) (msgLen & 0xF);
-
-        for (int i = 10; i < 10 + msgLen; i++) {
-            baFinal[i] = ba[i - 10];
-        }
-
-        byte byteXOR = (byte) 0;
-        if (msgLen < 1) {
-            baFinal[totalLen - 1] = byteXOR;
-        } else {
-            if (msgLen == 1) {
-                baFinal[totalLen - 1] = baFinal[totalLen - 2];
-            } else {
-                byteXOR = ba[0];
-                for (int i = 1; i < msgLen; i++) {
-                    byteXOR = (byte) (byteXOR ^ ba[i]);
-                }
-                baFinal[totalLen - 1] = byteXOR;
+                baFinal[12] = (byte) ((indexPackage >> 24) & 0xFF);
+                baFinal[13] = (byte) ((indexPackage >> 16) & 0xFF);
+                baFinal[14] = (byte) ((indexPackage >> 8) & 0xFF);
+                baFinal[15] = (byte) (indexPackage & 0xFF);
             }
         }
+
+        baFinal[16] = (byte) ((msgLen >> 8) & 0xFF);
+        baFinal[17] = (byte) (msgLen & 0xFF);
+
+        byte crc = (byte) 0;
+        for (int i = 0; i < msgLen; i++) {
+            crc = (byte) (crc ^ ba[i]);
+            baFinal[i + 18] = ba[i];
+        }
+        baFinal[baFinal.length - 1] = crc;
 
         return baFinal;
     }
 
-    public ResponsePackageInfo.ResponseType parseResponsePackage(byte[] ba) {
-        if(ba == null || ba.length < MESSAGE_RESPONSE_LENGTH)
-            return ResponseType.INVALID_RESPONSE;
+    /*
+    The caller should make sure ba != null
+     */
+    public ResponsePackageInfo parseResponsePackage(byte[] ba) {
+        ResponsePackageInfo rpi = new ResponsePackageInfo(ba);
+
+        if (ba == null || ba.length < MESSAGE_RESPONSE_LENGTH) {
+            rpi.setResponseCheckType(ResponsePackageInfo.ResponseCheckType.ERROR_INVALID);
+            return rpi;
+        }
 
         int dataLen = ba.length - MESSAGE_RESPONSE_LENGTH;
         byte[] baResponse = new byte[dataLen];
 
-        int index = (int)ba[0] << 8 | (int)ba[1];
-        if(index < 1 || index > MAX_MESSAGE_INDEX){
+        int index = (int) ba[0] << 24 | (int) ba[1] << 16 | (int) ba[2] << 8 | (int) ba[3];
+        if (index < 1 || index > MAX_MESSAGE_INDEX) {
             mLogService.Log(LogService.LogType.ERROR, "Server Response : INDEX ERROR " + String.valueOf(index));
-            return ResponseType.ERROR_INDEX;
+            rpi.setResponseCheckType(ResponsePackageInfo.ResponseCheckType.ERROR_INDEX);
+            return rpi;
         }
-        else
-            mLogService.Log(LogService.LogType.INFORMATION, "Server Response : INDEX " + String.valueOf(index));
-        int respIndex = (int)ba[2] << 8 | (int)ba[3];
-        if(index < 1 || index > MAX_MESSAGE_INDEX){
+        mLogService.Log(LogService.LogType.INFORMATION, "Server Response : INDEX " + String.valueOf(index));
+        rpi.setIndex(index);
+
+        int respIndex = (int) ba[4] << 24 | (int) ba[5] << 16 | (int) ba[6] << 8 | (int) ba[7];
+        if (index < 1 || index > MAX_MESSAGE_INDEX) {
             mLogService.Log(LogService.LogType.ERROR, "Server Response : RESPONSE INDEX ERROR " + String.valueOf(respIndex));
-            return ResponseType.ERROR_RESP_INDEX;
+            rpi.setResponseCheckType(ResponsePackageInfo.ResponseCheckType.ERROR_RESP_INDEX);
+            return rpi;
         }
-        else
-            mLogService.Log(LogService.LogType.INFORMATION, "Server Response : RESPONSE INDEX " + String.valueOf(respIndex));
+        mLogService.Log(LogService.LogType.INFORMATION, "Server Response : RESPONSE INDEX " + String.valueOf(respIndex));
+        rpi.setResponseIndex(respIndex);
 
-        boolean isMultiple = ((int)ba[4] & 0x8) == 0x8;
-
-        int respType = ((int)ba[4] & 0x7) << 8 | (int)ba[5];
-
-
-        int packageTotal = (int)ba[6] << 8 | (int)ba[7];
-        if(isMultiple == false && packageTotal != 0) {
-            mLogService.Log(LogService.LogType.ERROR, "Server Response : MULTIPLE ERROR" + String.valueOf(packageTotal));
-            return ResponseType.ERROR_PACK_TOTAL;
+        int reserved = (int) ba[8] << 8 | (int) ba[9];
+        if (reserved != 0) {
+            mLogService.Log(LogService.LogType.ERROR, "Server Response : RESERVED ERROR " + String.valueOf(reserved));
+            rpi.setResponseCheckType(ResponsePackageInfo.ResponseCheckType.ERROR_RESERVED);
+            return rpi;
         }
-        if(packageTotal < 1 || packageTotal > MAX_MESSAGE_INDEX){
+        mLogService.Log(LogService.LogType.INFORMATION, "Server Response : RESERVED " + String.valueOf(reserved));
+
+        boolean isMultiple = ((int) ba[10] & 0x8) == 0x8;
+        mLogService.Log(LogService.LogType.INFORMATION, "Server Response : MULTIPLE " + String.valueOf(isMultiple));
+        rpi.setIsMultiple(isMultiple);
+
+        int msgCheckTypeInteger = ((int) ba[10] & 0x7) << 8 | (int) ba[11];
+        MessagePackageInfo.MessageCheckType[] msgCheckTypeArray = MessagePackageInfo.MessageCheckType.values();
+        if (msgCheckTypeInteger < 0 || msgCheckTypeInteger > msgCheckTypeArray.length - 1) {
+            mLogService.Log(LogService.LogType.ERROR, "Server Response : MSG CHECK TYPE ERROR " + String.valueOf(msgCheckTypeInteger));
+            rpi.setResponseCheckType(ResponsePackageInfo.ResponseCheckType.ERROR_MSG_CHECK_TYPE);
+            return rpi;
+        }
+        mLogService.Log(LogService.LogType.INFORMATION, "Server Response : MSG CHECK TYPE " + String.valueOf(msgCheckTypeArray[msgCheckTypeInteger]));
+        rpi.setMessageCheckType(msgCheckTypeArray[msgCheckTypeInteger]);
+
+        int packageTotal = (int) ba[12] << 8 | (int) ba[13] << 8 | (int) ba[14] << 8 | (int) ba[15];
+        if ((isMultiple == false && packageTotal != 0) || (isMultiple == true && packageTotal < 1)) {
             mLogService.Log(LogService.LogType.ERROR, "Server Response : PACKAGE TOTAL ERROR" + String.valueOf(packageTotal));
-            return ResponseType.ERROR_PACK_TOTAL;
+            rpi.setResponseCheckType(ResponsePackageInfo.ResponseCheckType.ERROR_PACK_TOTAL);
+            return rpi;
         }
-        else
-            mLogService.Log(LogService.LogType.INFORMATION, "Server Response : PACKAGE TOTAL " + String.valueOf(packageTotal));
-        int packageIndex = (int)ba[8] << 8 | (int)ba[9];
-        if(packageIndex < 1 || packageIndex > packageTotal){
+        mLogService.Log(LogService.LogType.INFORMATION, "Server Response : PACKAGE TOTAL " + String.valueOf(packageTotal));
+        rpi.setPackageTotal(packageTotal);
+
+        int packageIndex = (int) ba[16] << 8 | (int) ba[17] << 8 | (int) ba[18] << 8 | (int) ba[19];
+        if ((isMultiple == false && packageIndex != 0) || (isMultiple == true && (packageIndex < 1 || packageIndex > packageTotal))) {
             mLogService.Log(LogService.LogType.ERROR, "Server Response : PACKAGE INDEX ERROR" + String.valueOf(packageIndex));
-            return ResponseType.ERROR_PACK_INDEX;
+            rpi.setResponseCheckType(ResponsePackageInfo.ResponseCheckType.ERROR_PACK_INDEX);
+            return rpi;
         }
-        else
-            mLogService.Log(LogService.LogType.INFORMATION, "Server Response : PACKAGE INDEX " + String.valueOf(index));
-        int len = (int)ba[10] << 8 | (int)ba[11];
-        if(len < 0 || len > MAX_MESSAGE_BODY_LENGTH) {
-            mLogService.Log(LogService.LogType.ERROR, "Server Response : LENGTH ERROR" + String.valueOf(len));
-            return ResponseType.ERROR_LEN;
+        mLogService.Log(LogService.LogType.INFORMATION, "Server Response : PACKAGE INDEX " + String.valueOf(packageIndex));
+        rpi.setPackageIndex(packageIndex);
+
+        int len = (int) ba[20] << 8 | (int) ba[21];
+        if (len < 0 || len > MAX_MESSAGE_BODY_LENGTH) {
+            mLogService.Log(LogService.LogType.ERROR, "Server Response : LEN ERROR" + String.valueOf(len));
+            rpi.setResponseCheckType(ResponsePackageInfo.ResponseCheckType.ERROR_LEN);
+            return rpi;
         }
-        if(len != dataLen) {
+        if (len != dataLen) {
             mLogService.Log(LogService.LogType.ERROR, "Server Response : LENGTH MISMATCH ERROR - LEN " + String.valueOf(len) + " V.S. DATA LEN " + String.valueOf(dataLen));
-            return ResponseType.ERROR_LEN_MISMATCH;
+            rpi.setResponseCheckType(ResponsePackageInfo.ResponseCheckType.ERROR_LEN_MISMATCH);
+            return rpi;
         }
         mLogService.Log(LogService.LogType.INFORMATION, "Server Response : LEN " + String.valueOf(len));
+        rpi.setLen(len);
 
-        byte crc = (byte)0;
-        for(int i=0; i<len; i++) {
-            if(i == 0)
-                crc = ba[i+11];
-            baResponse[i] = ba[i + 11];
+        byte crc = (byte) 0;
+        for (int i = 0; i < len; i++) {
+            crc = (byte)(crc ^ ba[i + 22]);
+            baResponse[i] = ba[i + 22];
         }
-        if(crc != ba[ba.length -1]) {
-            mLogService.Log(LogService.LogType.ERROR, "Server Response : CRC ERROR - CALC CRC " + String.valueOf(crc) + " V.S. CRC " + String.valueOf(ba[ba.length -1]));
-            return ResponseType.ERROR_CRC;
+        if (crc != ba[ba.length - 1]) {
+            mLogService.Log(LogService.LogType.ERROR, "Server Response : CRC ERROR - CALC CRC " + String.valueOf(crc) + " V.S. CRC " + String.valueOf(ba[ba.length - 1]));
+            rpi.setResponseCheckType(ResponsePackageInfo.ResponseCheckType.ERROR_CRC);
+            return rpi;
         }
-        else
-            mLogService.Log(LogService.LogType.INFORMATION, "Server Response : CRC " + String.valueOf(crc));
+        mLogService.Log(LogService.LogType.INFORMATION, "Server Response : CRC " + String.valueOf(crc));
+        rpi.setData(baResponse);
+        rpi.setCRC(crc);
 
-        return ResponseType.ACK_DATA;
+        rpi.setResponseCheckType(ResponsePackageInfo.ResponseCheckType.OK);
+        return rpi;
     }
 }

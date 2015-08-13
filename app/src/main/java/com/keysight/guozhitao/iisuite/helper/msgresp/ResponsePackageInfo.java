@@ -8,25 +8,23 @@ import java.io.Serializable;
 public class ResponsePackageInfo implements Serializable {
 
     public enum ResponseCheckType {
-        ACK_DATA,
-        INVALID_RESPONSE,
+        OK,
+        ERROR_INVALID,
         ERROR_INDEX,
         ERROR_RESP_INDEX,
         ERROR_RESERVED,
-        ERROR_MULTIPLE,
         ERROR_MSG_CHECK_TYPE,
         ERROR_PACK_TOTAL,
         ERROR_PACK_INDEX,
         ERROR_LEN,
         ERROR_LEN_MISMATCH,
-        ERROR_ACK_DATA_LEN,
-        ERROR_CRC,
+        ERROR_CRC
     }
 
     private int mIndex = 0;
     private int mResponseIndex = 0;
     private boolean mIsMultiple = false;
-    private MessagePackageInfo.MessageCheckType mMsgCheckType = MessagePackageInfo.MessageCheckType.PULSE_DATA;
+    private MessagePackageInfo.MessageCheckType mMsgCheckType = MessagePackageInfo.MessageCheckType.OK;
     private int mPackageTotal = 0;
     private int mPackageIndex = 0;
     private int mLen = 0;
@@ -38,7 +36,7 @@ public class ResponsePackageInfo implements Serializable {
     /*
     mRespCheckType will be set by the receiver, the mobile client.
      */
-    private ResponseCheckType mRespCheckType = ResponseCheckType.ACK_DATA;
+    private ResponseCheckType mRespCheckType = ResponseCheckType.OK;
 
     /*
     Constructor

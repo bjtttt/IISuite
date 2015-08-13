@@ -9,7 +9,7 @@ public class MessagePackageInfo implements Serializable {
 
     public enum MessagePackageType {
         Pulse,
-        ServerFeedback,
+        Request,
         SyncInstrumentFromServer,
         SyncInstrumentToServer,
         SyncInstrumentMergeServer,
@@ -23,7 +23,7 @@ public class MessagePackageInfo implements Serializable {
     The message is sent to server, so the server will check the message and report the status.
      */
     public enum MessageCheckType {
-        ACK,
+        OK,
         ERROR_INDEX,
         ERROR_RESERVED,
         ERROR_MULTIPLE,
@@ -57,7 +57,7 @@ public class MessagePackageInfo implements Serializable {
     if mMsgCheckType is MessageCheckType.PULSE_DATA and all mMsgCheckTypes of all sub MessagePackageInfos are MessageCheckType.PULSE_DATA,
     all sub MessagePackageInfos will be removed from the sending queue.
      */
-    private MessageCheckType mMsgCheckType = MessageCheckType.PULSE_DATA;
+    private MessageCheckType mMsgCheckType = MessageCheckType.OK;
 
     /*
     Constructor
