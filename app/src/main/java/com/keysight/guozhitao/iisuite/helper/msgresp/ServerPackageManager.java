@@ -81,21 +81,25 @@ public class ServerPackageManager implements Serializable {
         mLogService = gs.getLogService();
     }
 
-    public ArrayList<byte[]> composeMessages(MessageType msgType, String s) {
+    public ArrayList<byte[]> composeMsgs(MessagePackageInfo.MessagePackageType msgPackageType) {
+        return composeMsgs(msgPackageType, new byte[]{});
+    }
+
+    public ArrayList<byte[]> composeMsgs(MessagePackageInfo.MessagePackageType msgPackageType, String s) {
         if (s == null || s.length() < 1)
-            return getMessages(msgCat, msgType, new byte[]{});
+            return composeMsgs(msgPackageType, new byte[]{});
         else {
             try {
                 byte[] bs = s.getBytes("UTF-8");
-                return getMessages(msgCat, msgType, bs);
+                return composeMsgs(msgPackageType, bs);
             } catch (UnsupportedEncodingException e) {
                 byte[] bs = s.getBytes();
-                return getMessages(msgCat, msgType, bs);
+                return composeMsgs(msgPackageType, bs);
             }
         }
     }
 
-    public ArrayList<byte[]> getMessages(MessageCategory msgCat, MessageType msgType, byte[] ba) {
+    public ArrayList<byte[]> composeMsgs(MessagePackageInfo.MessagePackageType msgPackageType, byte[] ba) {
         if (ba == null)
             ba = new byte[]{};
 
@@ -109,7 +113,7 @@ public class ServerPackageManager implements Serializable {
         ArrayList<byte[]> messageList = new ArrayList<>();
 
         for (byte[] baItem : msgList) {
-            messageList.add(getMessage(msgCat, msgType, baItem, messageCount, messageIndex++));
+            messageList.add(composeMsg(msgPackageType, baItem, messageCount, messageIndex++));
         }
 
         return messageList;
@@ -140,11 +144,11 @@ public class ServerPackageManager implements Serializable {
         return messageList;
     }
 
-    private byte[] composePulse() {
-        return composeMessage(MessagePackageInfo.MessagePackageType.Pulse, null, 0, 0);
+    public byte[] composePulse() {
+        return composeMsg(MessagePackageInfo.MessagePackageType.Pulse, null, 0, 0);
     }
 
-    private byte[] composeMessage(MessagePackageInfo.MessagePackageType msgPackageType, byte[] ba, int totalPackage, int indexPackage) {
+    private byte[] composeMsg(MessagePackageInfo.MessagePackageType msgPackageType, byte[] ba, int totalPackage, int indexPackage) {
         if (mMessageIndex > MAX_MESSAGE_INDEX || mMessageIndex < 1)
             mMessageIndex = 1;
 
