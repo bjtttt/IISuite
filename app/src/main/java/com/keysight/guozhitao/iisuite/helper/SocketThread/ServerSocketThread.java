@@ -40,6 +40,16 @@ public class ServerSocketThread extends Thread implements Serializable {
         mGlobalSettings = globalSettings;
     }
 
+    private void setServerSocket(Socket socket) {
+        mServerSocket = socket;
+        if(mServerSocket == null && mGlobalSettings.getCurrentServerInfo().getAutoConnection() == false)
+            mGlobalSettings.setCurrentServerInfo(-1);
+    }
+
+    public Handler getServerSocketThreadHandler() {
+        return mHandler;
+    }
+
     public synchronized void setInSocketOperation(boolean inSocketOperation) {
         mInSocketOperation = inSocketOperation;
     }
@@ -63,14 +73,17 @@ public class ServerSocketThread extends Thread implements Serializable {
                         break;
                     case CLOSE_SERVER:
                         safeCloseServerSocket();
+                        mGlobalSettings.setCurrentServerInfo(-1);
                         break;
                     case SEND_DATA_TO_SERVER:
+                        mInSocketOperation = true;
                         MessagePackageInfo.MessagePackageType t = (MessagePackageInfo.MessagePackageType)msg.getData().get("TYPE");
                         String s = (String)msg.getData().get("MSG");
                         ArrayList<MessagePackageInfo> msgArray = mGlobalSettings.getServerPackageManager().composeMsgs(t, s);
                         for(MessagePackageInfo mpi : msgArray) {
                             safeSendServerData(mpi.getSource());
                         }
+                        mInSocketOperation = false;
                         break;
                 }
                 setInSocketOperation(false);
@@ -89,7 +102,7 @@ public class ServerSocketThread extends Thread implements Serializable {
         try {
             mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, "Try to create the server socket.");
 
-            mServerSocket = new Socket(mGlobalSettings.getCurrentServerInfo().getServer(), GlobalSettings.SERVER_SOCKET_PORT);
+            setServerSocket(new Socket(mGlobalSettings.getCurrentServerInfo().getServer(), GlobalSettings.SERVER_SOCKET_PORT));
             mServerOutputStream = mServerSocket.getOutputStream();
 
             mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, "The server socket is created.");
@@ -98,7 +111,7 @@ public class ServerSocketThread extends Thread implements Serializable {
             mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, "Fail to create the server socket.");
             mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, e.getMessage());
 
-            mServerSocket = null;
+            setServerSocket(null);
         }
     }
 
@@ -120,7 +133,7 @@ public class ServerSocketThread extends Thread implements Serializable {
             mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, e.getMessage());
         }
         finally {
-            mServerSocket = null;
+            setServerSocket(null);
         }
     }
 
@@ -157,7 +170,7 @@ public class ServerSocketThread extends Thread implements Serializable {
             sendServerData(s);
         }
         catch(Exception e) {
-            mServerSocket = null;
+            setServerSocket(null);
         }
     }
 

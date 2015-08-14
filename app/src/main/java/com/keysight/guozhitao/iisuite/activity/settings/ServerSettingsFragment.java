@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -26,7 +27,9 @@ import android.widget.SimpleAdapter;
 import com.keysight.guozhitao.iisuite.R;
 import com.keysight.guozhitao.iisuite.helper.DBService;
 import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
+import com.keysight.guozhitao.iisuite.helper.LogService;
 import com.keysight.guozhitao.iisuite.helper.ServerInfo;
+import com.keysight.guozhitao.iisuite.helper.socketthread.ServerSocketThread;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -283,14 +286,33 @@ public class ServerSettingsFragment extends Fragment {
 
         switch(mitemIndex) {
             default:
-            case 0: {
+                mGlobalSettings.getLogService().Log(LogService.LogType.ERROR, "Unknown server context menu selection - 0");
+                break;
+            case 0:
+                if(mGlobalSettings.getSocketService().getServerSendThread().getInSocketOperation() == true) {
+
+                }
+                else {
+                    if (mGlobalSettings.getCurrentServerInfo() != null) {
+                        Message msg = new Message();
+                        msg.what = ServerSocketThread.CLOSE_SERVER;
+                        mGlobalSettings.getSocketService().getServerSendThread().getServerSocketThreadHandler().sendMessage(msg);
+                    }
+
+                    Message msg = new Message();
+                    msg.what = ServerSocketThread.OPEN_SERVER;
+                    Bundle b = new Bundle();
+                    mGlobalSettings.getSocketService().getServerSendThread().getServerSocketThreadHandler().sendMessage(msg);
+                }
+                break;
+            case 1: {
                 final ServerInfo si = mGlobalSettings.getServerInfoList().get(info.position);
                 ClipboardManager clipboard = (android.content.ClipboardManager)getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("CopyServer", si.getServer());
                 clipboard.setPrimaryClip(clip);
             }
             break;
-            case 1: {
+            case 2: {
                 final ServerInfo si = mGlobalSettings.getServerInfoList().get(info.position);
                 LinearLayout ll = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.dialog_input_server, mViewGroup, false);
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -381,7 +403,7 @@ public class ServerSettingsFragment extends Fragment {
                 ad.show();
             }
             break;
-            case 2: {
+            case 3: {
                 ServerInfo si = mGlobalSettings.getServerInfoList().get(info.position);
                 AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
                 ab.setTitle(si.getServer()).setMessage((R.string.dialog_delete_server_msg))
@@ -417,7 +439,7 @@ public class ServerSettingsFragment extends Fragment {
                         .create().show();
             }
             break;
-            case 3: {
+            case 4: {
                 AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
                 ab.setTitle(mContextmenuItems[mitemIndex]).setMessage((R.string.dialog_delete_all_server_msg))
                         .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
