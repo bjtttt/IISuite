@@ -125,7 +125,7 @@ public class ServerSettingsFragment extends Fragment {
                 final EditText edittxtServer = (EditText) ll.findViewById(R.id.edittxt_server);
                 final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_server_timeout);
                 etxtTimeout.setText(Integer.toString(GlobalSettings.MIN_TIMEOUT));
-                //final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_server_connected);
+                final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_autoconn);
                 Button btnIncrease = (Button) ll.findViewById(R.id.button_increase_server_timeout);
                 btnIncrease.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -157,7 +157,7 @@ public class ServerSettingsFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         final String sServer = edittxtServer.getText().toString().trim();
                         final int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
-                        final boolean bConnected = true;//chkboxConncted.isChecked();
+                        final boolean bConnected = chkboxConncted.isChecked();
                         if(sServer.isEmpty()) {
                             AlertDialog.Builder builderEmpty = new AlertDialog.Builder(getActivity());
                             builderEmpty.setTitle("Add Server").setMessage("Cannot add empty server!")
@@ -190,7 +190,7 @@ public class ServerSettingsFragment extends Fragment {
                                 ServerInfo si = new ServerInfo();
                                 si.setServer(sServer);
                                 si.setTimeout(iTimeout);
-                                si.setConnected(bConnected);
+                                si.setAutoConnection(bConnected);
                                 serverInfoList.add(serverInfoList.size(), si);
                                 String sql = "INSERT INTO iis_server ( server, timeout, connected ) VALUES ( '" +
                                         sServer +
@@ -286,11 +286,11 @@ public class ServerSettingsFragment extends Fragment {
                 builder.setView(ll);
                 final EditText edittxtServer = (EditText) ll.findViewById(R.id.edittxt_server);
                 final EditText etxtTimeout = (EditText) ll.findViewById(R.id.etxt_server_timeout);
-                //final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_server_connected);
+                final CheckBox chkboxConncted = (CheckBox) ll.findViewById(R.id.chkbox_autoconn);
                 edittxtServer.setText(si.getServer());
                 etxtTimeout.setText(Integer.toString(si.getTimeout()));
                 edittxtServer.setEnabled(false);
-                //chkboxConncted.setChecked(si.getConnected());
+                chkboxConncted.setChecked(si.getAutoConnection());
                 Button btnIncrease = (Button) ll.findViewById(R.id.button_increase_server_timeout);
                 btnIncrease.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -321,14 +321,14 @@ public class ServerSettingsFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final int iTimeout = Integer.parseInt(etxtTimeout.getText().toString());
-                        final boolean bConnected = true;//chkboxConncted.isChecked();
-                        if(iTimeout != si.getTimeout() || bConnected != si.getConnected()) {
+                        final boolean bConnected = chkboxConncted.isChecked();
+                        if(iTimeout != si.getTimeout() || bConnected != si.getAutoConnection()) {
                             si.setTimeout(iTimeout);
-                            si.setConnected(bConnected);
+                            si.setAutoConnection(bConnected);
 
                             String sql = "UPDATE iis_server set " +
                                     "timeout = " + Integer.toString(iTimeout) +
-                                    ", connected = " + (bConnected ? "1" : "0") +
+                                    ", autoconn = " + (bConnected ? "1" : "0") +
                                     " WHERE server = '" + si.getServer() + "'";
                             mDBService.execSQL(sql);
 
@@ -416,9 +416,8 @@ public class ServerSettingsFragment extends Fragment {
                                 mDBService.execSQL("DELETE FROM iis_server");
                                 ServerInfo si = new ServerInfo();
                                 si.setServer("localhost");
-                                si.setConnected(true);
                                 serverInfoList.add(0, si);
-                                mDBService.execSQL("INSERT INTO iis_server ( server, timeout, connected ) VALUES ( 'localhost', 5, 1 )");
+                                mDBService.execSQL("INSERT INTO iis_server ( server, timeout, autoconn ) VALUES ( 'localhost', 5, 1 )");
 
                                 mServerArrayList.clear();
                                 int serverInfoListSize = serverInfoList.size();

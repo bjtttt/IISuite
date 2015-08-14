@@ -47,7 +47,7 @@ public class ServerInfo implements Serializable {
         StringBuilder sb = new StringBuilder();
         sb.append("Timeout ");
         sb.append(getTimeout() + "s, ");
-        sb.append(getAutoConnection()? "Auto Connection" : "Mannual Connection");
+        sb.append(getAutoConnection()? "Auto Connection" : "Manual Connection");
 
         return sb.toString();
     }

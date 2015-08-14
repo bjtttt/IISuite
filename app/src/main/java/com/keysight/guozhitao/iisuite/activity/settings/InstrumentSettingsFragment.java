@@ -478,12 +478,10 @@ public class InstrumentSettingsFragment extends Fragment {
                                 mDBService.execSQL("DELETE FROM iis_instr");
                                 InstrumentInfo ii = new InstrumentInfo();
                                 ii.setConnection("TCPIP0::localhost::inst0::INSTR");
-                                ii.setConnected(true);
                                 instrumentInfoList.add(0, ii);
                                 mDBService.execSQL("INSERT INTO iis_instr ( connection, timeout, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::INSTR', 5, 0, 0, 1, 0 )");
                                 ii = new InstrumentInfo();
                                 ii.setConnection("TCPIP0::localhost::INSTR");
-                                ii.setConnected(true);
                                 instrumentInfoList.add(0, ii);
                                 mDBService.execSQL("INSERT INTO iis_instr ( connection, timeout, idn, scpitree, connected, locked ) VALUES ( 'TCPIP0::localhost::inst0::INSTR', 5, 0, 0, 1, 0 )");
 

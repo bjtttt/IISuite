@@ -10,15 +10,18 @@
         android:layout_height="40dp">
 
         <TextView
-            android:layout_width="75dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:text="@string/server"
-            android:id="@+id/txtv_server" />
+            android:id="@+id/txtv_server"
+            android:layout_gravity="center"
+            android:gravity="center" />
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/edittxt_server" />
+            android:id="@+id/edittxt_server"
+            android:layout_marginLeft="5dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -27,50 +30,60 @@
         android:layout_height="40dp">
 
         <TextView
-            android:layout_width="75dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:text="@string/timeout"
-            android:id="@+id/txtv_server_timeout" />
+            android:id="@+id/txtv_server_timeout"
+            android:layout_gravity="center"
+            android:gravity="center" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:background="@drawable/minus"
             android:id="@+id/button_decrease_server_timeout"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginLeft="5dp" />
 
         <EditText
-            android:layout_width="100dp"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:inputType="number"
             android:ems="10"
             android:id="@+id/etxt_server_timeout"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="5" />
+            android:gravity="center"
+            android:text="5"
+            android:layout_gravity="center" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:background="@drawable/plus"
             android:id="@+id/button_increase_server_timeout"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:gravity="center" />
 
     </LinearLayout>
 
-    <!--LinearLayout
+    <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"-->
+        android:layout_height="wrap_content">
 
-        <!--CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/idn"
-            android:id="@+id/chkbox_idn" />
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="wrap_content" />
 
         <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/auto_connection"
+            android:id="@+id/chkbox_autoconn" />
+
+        <!--CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/scpi_tree"
@@ -87,5 +100,5 @@
             android:layout_height="wrap_content"
             android:text="@string/locked"
             android:id="@+id/chkbox_locked" /-->
-        <!--/LinearLayout-->
+        </LinearLayout>
 </LinearLayout>

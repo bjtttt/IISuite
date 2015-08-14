@@ -72,42 +72,50 @@ public class ServerSocketThread extends Thread implements Serializable {
 
     public boolean isServerSocketAvailable() { return mServerSocket != null; }
 
-    private void openServerSocket() throws IOException {
-        closeServerSocket();
-
-        mServerSocket = new Socket(mGlobalSettings.getCurrentServerInfo().getServer(), GlobalSettings.SERVER_SOCKET_PORT);
-    }
-
     public void safeOpenServerSocket() {
+        safeCloseServerSocket();
+
         try {
-            openServerSocket();
+            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, "Try to create the server socket.");
+
+            mServerSocket = new Socket(mGlobalSettings.getCurrentServerInfo().getServer(), GlobalSettings.SERVER_SOCKET_PORT);
+            mServerOutputStream = mServerSocket.getOutputStream();
+
+            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, "The server socket is created.");
         }
         catch(Exception e) {
-            mServerSocket = null;
-        }
-    }
+            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, "Fail to create the server socket.");
+            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, e.getMessage());
 
-    private void closeServerSocket() throws IOException {
-        if(!mServerSocket.isClosed()) {
-            mServerSocket.close();
             mServerSocket = null;
         }
     }
 
     public void safeCloseServerSocket() {
+        if(mServerSocket == null)
+            return;
+
         try {
-            closeServerSocket();
+            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, "Try to close the server socket.");
+
+            if(!mServerSocket.isClosed()) {
+                mServerSocket.close();
+            }
+
+            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, "The server socket is closed.");
         }
         catch(Exception e) {
+            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, "Fail to close the server socket.");
+            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, e.getMessage());
+        }
+        finally {
             mServerSocket = null;
         }
     }
 
-    protected void sendServerData(String s) throws IOException {
-        if(s == null)
-            throw new IllegalArgumentException("SocketService::SendData(null)");
-        if(s.isEmpty())
-            throw new IllegalArgumentException("SocketService::SendData(\"\")");
+    private void sendServerData(String s) throws IOException {
+        if(s == null || s.isEmpty())
+            return;
 
         byte[] ba = null;
         try {
@@ -119,28 +127,32 @@ public class ServerSocketThread extends Thread implements Serializable {
         sendServerData(ba);
     }
 
-    public void safeSendServerData(String sMessage){
+    private void sendServerData(byte[] ba) throws IOException {
+        if(ba == null || ba.length < 1)
+            return;
+
+        if(mServerSocket == null && mGlobalSettings.getCurrentServerInfo().getAutoConnection() == true)
+            safeOpenServerSocket();
+        else {
+            mGlobalSettings.getLogService().Log(LogService.LogType.ERROR, "No socket to server.");
+            return;
+        }
+
+        mServerOutputStream.write(ba);
+    }
+
+    public void safeSendServerData(String s){
         try {
-            sendServerData(sMessage);
+            sendServerData(s);
         }
         catch(Exception e) {
             mServerSocket = null;
         }
     }
 
-    private void sendServerData(byte[] baMessage) throws IOException {
-        if(mServerSocket == null)
-            openServerSocket();
-
-
-
-        if(!mGlobalSettings.getCurrentInstrumentInfo().getConnected())
-            closeServerSocket();
-    }
-
-    public void safeSendServerData(byte[] baMessage){
+    public void safeSendServerData(byte[] ba){
         try {
-            sendServerData(baMessage);
+            sendServerData(ba);
         }
         catch(Exception e) {
             mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, "Fail to send data to server.");

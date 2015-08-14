@@ -79,11 +79,11 @@ public class MainActivity
     public final String[] mServerDBColNames = new String[] {
             "server",
             "timeout",
-            "connected"
+            "autoconn"
     };
     public final int DB_SERVER_COL_SERVER = 0;
     public final int DB_SERVER_COL_TIMEOUT = 1;
-    public final int DB_SERVER_COL_CONNECTED = 2;
+    public final int DB_SERVER_COL_AUTO_CONN = 2;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -131,7 +131,6 @@ public class MainActivity
         if(bFindLocal == false) {
             InstrumentInfo ii = new InstrumentInfo();
             ii.setConnection("localhost");
-            ii.setConnected(true);
             mGlobalSettings.getInstrumentInfoList().add(0, ii);
             mDBService.execSQL("INSERT INTO iis_instr ( connection, timeout, idn, scpitree, connected, locked ) VALUES ( 'localhost', 5, 0, 0, 1, 0 )");
         }
@@ -143,7 +142,7 @@ public class MainActivity
             ServerInfo si = new ServerInfo();
             si.setServer(c.getString(c.getColumnIndex(mServerDBColNames[DB_SERVER_COL_SERVER])));
             si.setTimeout(c.getInt(c.getColumnIndex(mServerDBColNames[DB_SERVER_COL_TIMEOUT])));
-            si.setConnected(c.getInt(c.getColumnIndex(mServerDBColNames[DB_SERVER_COL_CONNECTED])) == 1);
+            si.setAutoConnection(c.getInt(c.getColumnIndex(mServerDBColNames[DB_SERVER_COL_AUTO_CONN])) == 1);
             mGlobalSettings.getServerInfoList().add(si);
 
             if(si.getServer().compareToIgnoreCase("localhost") == 0)
@@ -154,9 +153,8 @@ public class MainActivity
         if(bFindLocal == false) {
             ServerInfo si = new ServerInfo();
             si.setServer("localhost");
-            si.setConnected(true);
             mGlobalSettings.getServerInfoList().add(0, si);
-            mDBService.execSQL("INSERT INTO iis_server ( server, timeout , connected ) VALUES ( 'localhost', 5, 1 )");
+            mDBService.execSQL("INSERT INTO iis_server ( server, timeout , autoconn ) VALUES ( 'localhost', 5, 1 )");
         }
 
         setContentView(R.layout.activity_main);

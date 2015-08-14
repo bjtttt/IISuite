@@ -497,6 +497,7 @@
     <string name="idn">*IDN?</string>
     <string name="scpi_tree">SCPI Tree</string>
     <string name="connected">Connected</string>
+    <string name="auto_connection">Auto Connection</string>
     <string name="locked">Locked</string>
     <string name="connection">Connection</string>
     <string name="timeout">Timeout (s)</string>

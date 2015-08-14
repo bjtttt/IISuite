@@ -21,14 +21,14 @@ public class DBService extends SQLiteOpenHelper implements Serializable {
                 "timeout INTEGER NOT NULL DEFAULT 5, " +
                 "idn BOOLEAN NOT NULL DEFAULT FALSE, " +
                 "scpitree BOOLEAN NOT NULL DEFAULT FALSE," +
-                "connected BOOLEAN NOT NULL DEFAULT FALSE," +
+                "connected BOOLEAN NOT NULL DEFAULT TRUE," +
                 "locked BOOLEAN NOT NULL DEFAULT FALSE )";
         db.execSQL(sql);
 
         sql = "CREATE TABLE iis_server ( " +
                 "server VARCHAR(100) PRIMARY KEY, " +
                 "timeout INTEGER NOT NULL DEFAULT 5, " +
-                "connected BOOLEAN NOT NULL DEFAULT FALSE )";
+                "autoconn BOOLEAN NOT NULL DEFAULT TRUE )";
         db.execSQL(sql);
     }
 
