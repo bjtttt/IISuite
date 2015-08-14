@@ -15,7 +15,9 @@
             android:text="@string/server"
             android:id="@+id/txtv_server"
             android:layout_gravity="center"
-            android:gravity="center" />
+            android:gravity="center"
+            android:textColor="#ff000000"
+            android:textStyle="bold" />
 
         <EditText
             android:layout_width="match_parent"
@@ -35,7 +37,9 @@
             android:text="@string/timeout"
             android:id="@+id/txtv_server_timeout"
             android:layout_gravity="center"
-            android:gravity="center" />
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="#ff000000" />
 
         <Button
             style="?android:attr/buttonStyleSmall"

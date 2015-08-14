@@ -32,11 +32,20 @@ public class ServerSocketThread extends Thread implements Serializable {
     private OutputStream mServerOutputStream;
 
     private Socket mServerSocket = null;
+    private boolean mInSocketOperation = false;
 
     public ServerSocketThread(GlobalSettings globalSettings) {
         super();
 
         mGlobalSettings = globalSettings;
+    }
+
+    public synchronized void setInSocketOperation(boolean inSocketOperation) {
+        mInSocketOperation = inSocketOperation;
+    }
+
+    public synchronized boolean getInSocketOperation() {
+        return mInSocketOperation;
     }
 
     @Override
@@ -45,6 +54,7 @@ public class ServerSocketThread extends Thread implements Serializable {
         mHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
+                setInSocketOperation(true);
                 switch(msg.what) {
                     default:
                         break;
@@ -63,6 +73,7 @@ public class ServerSocketThread extends Thread implements Serializable {
                         }
                         break;
                 }
+                setInSocketOperation(false);
             }
         };
         Looper.loop();

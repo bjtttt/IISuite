@@ -52,6 +52,8 @@ public class ServerSettingsFragment extends Fragment {
     private String mParam2;
 
     private String[] mContextmenuItems = new String[] {
+            "Connect",
+            "Disconnect",
             "Copy Name",
             "Modify Configuration",
             "Delete Server",
@@ -254,9 +256,20 @@ public class ServerSettingsFragment extends Fragment {
 
         if (v.getId() == R.id.server_listview) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-            menu.setHeaderTitle(mGlobalSettings.getServerInfoList().get(info.position).getServer());
+            String selectedServer = mGlobalSettings.getServerInfoList().get(info.position).getServer();
+            String currentServer = (mGlobalSettings.getCurrentServerInfo() == null) ? "" : mGlobalSettings.getCurrentServerInfo().getServer();
+            menu.setHeaderTitle(selectedServer);
+            boolean isConnectedServer = currentServer.compareTo(selectedServer) == 0;
             for (int i = 0; i < mContextmenuItems.length; i++) {
-                menu.add(Menu.NONE, i, i, mContextmenuItems[i]);
+                if (isConnectedServer == true && i == 0)
+                    continue;
+                if (isConnectedServer == false && i == 1)
+                    continue;
+
+                if (i > 0)
+                    menu.add(Menu.NONE, i - 1, i - 1, mContextmenuItems[i]);
+                else
+                    menu.add(Menu.NONE, i, i, mContextmenuItems[i]);
             }
         }
     }
