@@ -42,7 +42,7 @@ public class ServerSocketThread extends Thread implements Serializable {
 
     private void setServerSocket(Socket socket) {
         mServerSocket = socket;
-        if(mServerSocket == null && mGlobalSettings.getCurrentServerInfo().getAutoConnection() == false)
+        if(mServerSocket == null && mGlobalSettings.getCurrentServerInfo() != null && mGlobalSettings.getCurrentServerInfo().getAutoConnection() == false)
             mGlobalSettings.setCurrentServerInfo(-1);
     }
 
@@ -69,7 +69,8 @@ public class ServerSocketThread extends Thread implements Serializable {
                     default:
                         break;
                     case OPEN_SERVER:
-                        safeOpenServerSocket();
+                        String server = ((CharSequence)msg.getData().get("SERVER")).toString();
+                        safeOpenServerSocket(server);
                         break;
                     case CLOSE_SERVER:
                         safeCloseServerSocket();
@@ -78,7 +79,7 @@ public class ServerSocketThread extends Thread implements Serializable {
                     case SEND_DATA_TO_SERVER:
                         mInSocketOperation = true;
                         MessagePackageInfo.MessagePackageType t = (MessagePackageInfo.MessagePackageType)msg.getData().get("TYPE");
-                        String s = (String)msg.getData().get("MSG");
+                        String s = ((CharSequence)msg.getData().get("MSG")).toString();
                         ArrayList<MessagePackageInfo> msgArray = mGlobalSettings.getServerPackageManager().composeMsgs(t, s);
                         for(MessagePackageInfo mpi : msgArray) {
                             safeSendServerData(mpi.getSource());
@@ -96,15 +97,16 @@ public class ServerSocketThread extends Thread implements Serializable {
 
     public boolean isServerSocketAvailable() { return mServerSocket != null; }
 
-    public void safeOpenServerSocket() {
+    public void safeOpenServerSocket(String server) {
         safeCloseServerSocket();
 
         try {
             mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, "Try to create the server socket.");
 
-            setServerSocket(new Socket(mGlobalSettings.getCurrentServerInfo().getServer(), GlobalSettings.SERVER_SOCKET_PORT));
+            setServerSocket(new Socket(server, GlobalSettings.SERVER_SOCKET_PORT));
             mServerOutputStream = mServerSocket.getOutputStream();
 
+            mGlobalSettings.setCurrentServerInfo(server);
             mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, "The server socket is created.");
         }
         catch(Exception e) {
@@ -154,9 +156,13 @@ public class ServerSocketThread extends Thread implements Serializable {
     private void sendServerData(byte[] ba) throws IOException {
         if(ba == null || ba.length < 1)
             return;
+        if(mGlobalSettings.getCurrentServerInfo() == null) {
+            mGlobalSettings.getLogService().Log(LogService.LogType.ERROR, "No server.");
+            return;
+        }
 
         if(mServerSocket == null && mGlobalSettings.getCurrentServerInfo().getAutoConnection() == true)
-            safeOpenServerSocket();
+            safeOpenServerSocket(mGlobalSettings.getCurrentServerInfo().getServer());
         else {
             mGlobalSettings.getLogService().Log(LogService.LogType.ERROR, "No socket to server.");
             return;

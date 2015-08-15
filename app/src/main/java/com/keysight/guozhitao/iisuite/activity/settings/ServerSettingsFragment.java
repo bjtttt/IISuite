@@ -197,7 +197,7 @@ public class ServerSettingsFragment extends Fragment {
                                 si.setTimeout(iTimeout);
                                 si.setAutoConnection(bConnected);
                                 serverInfoList.add(serverInfoList.size(), si);
-                                String sql = "INSERT INTO iis_server ( server, timeout, connected ) VALUES ( '" +
+                                String sql = "INSERT INTO iis_server ( server, timeout, autoconn ) VALUES ( '" +
                                         sServer +
                                         "', " + Integer.toString(iTimeout) +
                                         ", " + (bConnected ? "1" : "0") +
@@ -290,7 +290,14 @@ public class ServerSettingsFragment extends Fragment {
                 break;
             case 0:
                 if(mGlobalSettings.getSocketService().getServerSendThread().getInSocketOperation() == true) {
-
+                    AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+                    ab.setTitle(item.getTitle().toString()).setMessage("Cannot interrupt a talk to the server.")
+                            .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            })
+                            .create().show();
                 }
                 else {
                     if (mGlobalSettings.getCurrentServerInfo() != null) {
@@ -302,6 +309,8 @@ public class ServerSettingsFragment extends Fragment {
                     Message msg = new Message();
                     msg.what = ServerSocketThread.OPEN_SERVER;
                     Bundle b = new Bundle();
+                    b.putCharSequence("SERVER", mGlobalSettings.getServerInfoList().get(info.position).getServer());
+                    msg.setData(b);
                     mGlobalSettings.getSocketService().getServerSendThread().getServerSocketThreadHandler().sendMessage(msg);
                 }
                 break;
