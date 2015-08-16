@@ -1,5 +1,7 @@
 package com.keysight.guozhitao.iisuite.helper;
 
+import android.os.Handler;
+
 import com.keysight.guozhitao.iisuite.helper.msgresp.MessagePackageInfo;
 import com.keysight.guozhitao.iisuite.helper.msgresp.ResponsePackageInfo;
 import com.keysight.guozhitao.iisuite.helper.msgresp.ServerPackageManager;
@@ -11,6 +13,10 @@ import java.util.ArrayList;
  * Created by cn569363 on 7/16/2015.
  */
 public class GlobalSettings implements Serializable {
+
+    public final static String KEY_MSG_SHORT = "MSG";
+    public final static String KEY_SERVER = "SERVER";
+    public final static String KEY_UTF8 = "UTF-8";
 
     public final static int MIN_TIMEOUT = 5;
     public final static int MAX_TIMEOUT = 3600 * 24;
@@ -36,6 +42,8 @@ public class GlobalSettings implements Serializable {
     private ArrayList<MessagePackageInfo> mMsgPackageInfoSentArray = new ArrayList<MessagePackageInfo>();
     private ArrayList<ResponsePackageInfo> mRespPackageInfoSentArray = new ArrayList<ResponsePackageInfo>();
 
+    private Handler mMainHandler;
+
     private GlobalSettings() {
         mServerPackageManager = ServerPackageManager.getInstance();
         mServerPackageManager.setGlobalSettings(this);
@@ -48,6 +56,14 @@ public class GlobalSettings implements Serializable {
 
     public static GlobalSettings getInstance() {
         return mGlobalSettings;
+    }
+
+    public void setMainHandler(Handler h) {
+        mMainHandler = h;
+    }
+
+    public Handler getMainhandler() {
+        return mMainHandler;
     }
 
     public ServerPackageManager getServerPackageManager() {

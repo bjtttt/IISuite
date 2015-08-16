@@ -27,6 +27,7 @@ import com.keysight.guozhitao.iisuite.helper.InstrumentInfo;
 import com.keysight.guozhitao.iisuite.helper.ServerInfo;
 import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
 import com.keysight.guozhitao.iisuite.helper.SocketService;
+import com.keysight.guozhitao.iisuite.helper.thread.MainMessageThread;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,6 +103,8 @@ public class MainActivity
     private DBService mDBService;
     private GlobalSettings mGlobalSettings;
 
+    private MainMessageThread mMainMsgThread;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -167,6 +170,9 @@ public class MainActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        mMainMsgThread = new MainMessageThread(mGlobalSettings, this);
+        mMainMsgThread.start();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.keysight.guozhitao.iisuite.helper;
 
-import com.keysight.guozhitao.iisuite.helper.socketthread.InstrumentSocketThread;
-import com.keysight.guozhitao.iisuite.helper.socketthread.ServerSocketThread;
+import com.keysight.guozhitao.iisuite.helper.thread.InstrumentSocketThread;
+import com.keysight.guozhitao.iisuite.helper.thread.ServerSocketThread;
 
 import java.io.Serializable;
 

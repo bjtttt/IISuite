@@ -29,7 +29,7 @@ import com.keysight.guozhitao.iisuite.helper.DBService;
 import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
 import com.keysight.guozhitao.iisuite.helper.LogService;
 import com.keysight.guozhitao.iisuite.helper.ServerInfo;
-import com.keysight.guozhitao.iisuite.helper.socketthread.ServerSocketThread;
+import com.keysight.guozhitao.iisuite.helper.thread.ServerSocketThread;
 
 import java.util.ArrayList;
 import java.util.HashMap;
