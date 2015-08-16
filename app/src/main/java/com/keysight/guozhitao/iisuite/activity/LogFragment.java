@@ -1,12 +1,17 @@
 package com.keysight.guozhitao.iisuite.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.keysight.guozhitao.iisuite.R;
 
@@ -67,7 +72,44 @@ public class LogFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_log, container, false);
+
+        View v = inflater.inflate(R.layout.fragment_log, container, false);
+
+        final TextView txtvLog = (TextView) v.findViewById(R.id.txtv_log);
+        Button btnCopy = (Button) v.findViewById(R.id.btn_copy_log);
+        btnCopy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
+        Button btnClear = (Button) v.findViewById(R.id.btn_clear_log);
+        btnClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(txtvLog.getText().length() > 0) {
+                    AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+                    ab.setTitle("Log").setMessage("Are you sure to clear the log?")
+                            .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    txtvLog.setText("");
+                                }
+                            })
+                            .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Do nothing here
+                                }
+                            })
+                            .create().show();
+                }
+                else {
+                    Toast.makeText(getActivity().getApplicationContext(), "No log to be cleared.", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        return v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

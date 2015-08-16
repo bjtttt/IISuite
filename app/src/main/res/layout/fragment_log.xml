@@ -3,8 +3,48 @@
     android:layout_height="match_parent"
     tools:context="com.keysight.guozhitao.iisuite.activity.LogFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <!-- TODO: Update blank fragment layout -->
+
+        <TextView android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/txtv_log"
+            android:text="@string/hello_blank_fragment"
+            android:layout_weight="1.00" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="40dp"
+            android:layout_height="fill_parent"
+            android:background="#649b9b9b">
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="40dp"
+                android:id="@+id/btn_copy_log"
+                android:background="@drawable/copy"
+                android:layout_margin="1dp" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="bottom">
+
+                <Button
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:id="@+id/btn_clear_log"
+                    android:background="@drawable/clear"
+                    android:layout_margin="1dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
 
 </FrameLayout>
