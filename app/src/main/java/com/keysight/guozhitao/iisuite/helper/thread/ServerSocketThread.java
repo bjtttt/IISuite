@@ -81,7 +81,6 @@ public class ServerSocketThread extends Thread implements Serializable {
                         String server = ((CharSequence)msg.getData().get(GlobalSettings.KEY_SERVER)).toString();
                         mServer = server;
                         safeOpenServerSocket(server);
-                        mGlobalSettings.setCurrentServerInfo(server);
                         break;
                     case CLOSE_SERVER:
                         safeCloseServerSocket();
@@ -112,21 +111,12 @@ public class ServerSocketThread extends Thread implements Serializable {
         safeCloseServerSocket();
 
         try {
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, MSG_TRY_TO_CREATE_SERVER_SOCKET);
-
             mServerSocket = new Socket(server, GlobalSettings.SERVER_SOCKET_PORT);
             mServerOutputStream = mServerSocket.getOutputStream();
-
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, MSG_SOCKET_CREATION_OK);
-
-            ToastMessage(MSG_SOCKET_CREATION_OK);
+            mGlobalSettings.setCurrentServerInfo(server);
         }
         catch(Exception e) {
-            ToastMessage(MSG_SOCKET_CREATION_FAILURE);
-
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, mServer);
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, MSG_SOCKET_CREATION_FAILURE);
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, e.getMessage());
+            ToastMessage(MSG_SOCKET_CREATION_FAILURE + "\n" + e.getMessage());
 
             mServerSocket = null;
         }
@@ -146,22 +136,12 @@ public class ServerSocketThread extends Thread implements Serializable {
             return;
 
         try {
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, MSG_TRY_TO_CLOSE_SERVER_SOCKET);
-
             if(!mServerSocket.isClosed()) {
                 mServerSocket.close();
             }
-
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, MSG_SOCKET_CLOSE_OK);
-
-            ToastMessage(MSG_SOCKET_CLOSE_OK);
         }
         catch(Exception e) {
-            ToastMessage(MSG_SOCKET_CLOSE_FAILURE + " : " + mServer);
-
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, mServer);
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, MSG_SOCKET_CLOSE_FAILURE);
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, e.getMessage());
+            ToastMessage(MSG_SOCKET_CLOSE_FAILURE + "\n" + e.getMessage());
         }
         finally {
             mServerSocket = null;
@@ -177,12 +157,7 @@ public class ServerSocketThread extends Thread implements Serializable {
             ba = s.getBytes(GlobalSettings.KEY_UTF8);
         }
         catch (UnsupportedEncodingException e) {
-            ToastMessage(UTF8_CONVERSION_ERROR);
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, mServer);
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, s);
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, UTF8_CONVERSION_ERROR);
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, e.getMessage());
-
+            ToastMessage(UTF8_CONVERSION_ERROR + "\n" + e.getMessage());
             ba = s.getBytes();
         }
         sendServerData(ba);
@@ -191,19 +166,15 @@ public class ServerSocketThread extends Thread implements Serializable {
     private void sendServerData(byte[] ba) throws IOException {
         if(ba == null || ba.length < 1)
             return;
-        if(mGlobalSettings.getCurrentServerInfo() == null) {
+        if(mGlobalSettings.getCurrentServerInfo() == null)
             ToastMessage(MSG_NO_SELECTED_SERVER);
-            mGlobalSettings.getLogService().Log(LogService.LogType.ERROR, MSG_NO_SELECTED_SERVER);
-        }
         else {
             if (mServerSocket == null && mGlobalSettings.getCurrentServerInfo().getAutoConnection() == true) {
                 safeOpenServerSocket(mGlobalSettings.getCurrentServerInfo().getServer());
                 mServerOutputStream.write(ba);
             }
-            else {
+            else
                 ToastMessage(MSG_NO_ACTIVE_SERVER_SOCKET);
-                mGlobalSettings.getLogService().Log(LogService.LogType.ERROR, MSG_NO_ACTIVE_SERVER_SOCKET);
-            }
         }
     }
 
@@ -212,11 +183,7 @@ public class ServerSocketThread extends Thread implements Serializable {
             sendServerData(s);
         }
         catch(Exception e) {
-            ToastMessage(MSG_SOCKET_DATA_FAILURE);
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, mServer);
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, MSG_SOCKET_DATA_FAILURE);
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, e.getMessage());
-
+            ToastMessage(MSG_SOCKET_DATA_FAILURE + "\n" + e.getMessage());
             safeCloseServerSocket();
         }
     }
@@ -224,13 +191,8 @@ public class ServerSocketThread extends Thread implements Serializable {
     public void safeSendServerData(byte[] ba){
         try {
             sendServerData(ba);
-        }
-        catch(Exception e) {
-            ToastMessage(MSG_SOCKET_DATA_FAILURE);
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, mServer);
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, MSG_SOCKET_DATA_FAILURE);
-            mGlobalSettings.getLogService().Log(LogService.LogType.WARNING, e.getMessage());
-
+        } catch (Exception e) {
+            ToastMessage(MSG_SOCKET_DATA_FAILURE + "\n" + e.getMessage());
             safeCloseServerSocket();
         }
     }
