@@ -176,6 +176,15 @@ public class GlobalSettings implements Serializable {
         }
     }
 
+    public ServerInfo getServerInfo(String server) {
+        for (ServerInfo info : mServerInfoList) {
+            if (info.getServer().compareTo(server.trim()) == 0) {
+                return info;
+            }
+        }
+        return null;
+    }
+
     public ArrayList<ServerInfo> getServerInfoList() {
         return mServerInfoList;
     }

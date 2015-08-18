@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.keysight.guozhitao.iisuite.activity.MainActivity;
 import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
 import com.keysight.guozhitao.iisuite.helper.LogService;
+import com.keysight.guozhitao.iisuite.helper.ServerInfo;
 import com.keysight.guozhitao.iisuite.helper.msgresp.MessagePackageInfo;
 
 import java.io.IOException;
@@ -39,6 +40,9 @@ public class ServerSocketThread extends Thread implements Serializable {
     public final static String MSG_NO_ACTIVE_SERVER_SOCKET = "No active socket to the server.";
     public final static String UTF8_CONVERSION_ERROR = "Fail to convert the string to be of the UTF-8 format.";
 
+    /*
+    Be set when OPEN_SERVER and be reset when CLOSE_SERVER
+     */
     private String mServer = "";
 
     private Handler mHandler = null;
@@ -78,9 +82,8 @@ public class ServerSocketThread extends Thread implements Serializable {
                     default:
                         break;
                     case OPEN_SERVER:
-                        String server = ((CharSequence)msg.getData().get(GlobalSettings.KEY_SERVER)).toString();
-                        mServer = server;
-                        safeOpenServerSocket(server);
+                        mServer = ((CharSequence)msg.getData().get(GlobalSettings.KEY_SERVER)).toString();
+                        safeOpenServerSocket();
                         break;
                     case CLOSE_SERVER:
                         safeCloseServerSocket();
@@ -107,13 +110,13 @@ public class ServerSocketThread extends Thread implements Serializable {
 
     public boolean isServerSocketAvailable() { return mServerSocket != null; }
 
-    public void safeOpenServerSocket(String server) {
+    public void safeOpenServerSocket() {
         safeCloseServerSocket();
 
         try {
-            mServerSocket = new Socket(server, GlobalSettings.SERVER_SOCKET_PORT);
+            mServerSocket = new Socket(mServer, GlobalSettings.SERVER_SOCKET_PORT);
             mServerOutputStream = mServerSocket.getOutputStream();
-            mGlobalSettings.setCurrentServerInfo(server);
+            mGlobalSettings.setCurrentServerInfo(mServer);
         }
         catch(Exception e) {
             ToastMessage(MSG_SOCKET_CREATION_FAILURE + "\n" + e.getMessage());
@@ -169,9 +172,15 @@ public class ServerSocketThread extends Thread implements Serializable {
         if(mGlobalSettings.getCurrentServerInfo() == null)
             ToastMessage(MSG_NO_SELECTED_SERVER);
         else {
-            if (mServerSocket == null && mGlobalSettings.getCurrentServerInfo().getAutoConnection() == true) {
-                safeOpenServerSocket(mGlobalSettings.getCurrentServerInfo().getServer());
-                mServerOutputStream.write(ba);
+            if (mServerSocket == null) {
+                ServerInfo si = mGlobalSettings.getServerInfo(mServer);
+                if (si != null &&  si.getAutoConnection() == true)
+                    safeOpenServerSocket();
+
+                if (mServerSocket != null)
+                    mServerOutputStream.write(ba);
+                else
+                    ToastMessage(MSG_NO_ACTIVE_SERVER_SOCKET);
             }
             else
                 ToastMessage(MSG_NO_ACTIVE_SERVER_SOCKET);
