@@ -119,32 +119,23 @@ public class ServerSocketThread extends Thread implements Serializable {
             mGlobalSettings.setCurrentServerInfo(mServer);
         }
         catch(Exception e) {
-            ToastMessage(MSG_SOCKET_CREATION_FAILURE + "\n" + e.getMessage());
+            mGlobalSettings.toastMessage(MSG_SOCKET_CREATION_FAILURE + "\n" + e.getMessage());
 
             mServerSocket = null;
         }
     }
 
-    private void ToastMessage(String msg) {
-        Message message = new Message();
-        message.what = MainMessageThread.TOAST_MSG;
-        Bundle b = new Bundle();
-        b.putCharSequence(GlobalSettings.KEY_MSG_SHORT, msg);
-        message.setData(b);
-        mGlobalSettings.getMainhandler().sendMessage(message);
-    }
-
     public void safeCloseServerSocket() {
         if(mServerSocket == null)
             return;
-
         try {
             if(!mServerSocket.isClosed()) {
+                mServerOutputStream.close();
                 mServerSocket.close();
             }
         }
         catch(Exception e) {
-            ToastMessage(MSG_SOCKET_CLOSE_FAILURE + "\n" + e.getMessage());
+            mGlobalSettings.toastMessage(MSG_SOCKET_CLOSE_FAILURE + "\n" + e.getMessage());
         }
         finally {
             mServerSocket = null;
@@ -160,7 +151,7 @@ public class ServerSocketThread extends Thread implements Serializable {
             ba = s.getBytes(GlobalSettings.KEY_UTF8);
         }
         catch (UnsupportedEncodingException e) {
-            ToastMessage(UTF8_CONVERSION_ERROR + "\n" + e.getMessage());
+            mGlobalSettings.toastMessage(UTF8_CONVERSION_ERROR + "\n" + e.getMessage());
             ba = s.getBytes();
         }
         sendServerData(ba);
@@ -170,20 +161,22 @@ public class ServerSocketThread extends Thread implements Serializable {
         if(ba == null || ba.length < 1)
             return;
         if(mGlobalSettings.getCurrentServerInfo() == null)
-            ToastMessage(MSG_NO_SELECTED_SERVER);
+            mGlobalSettings.toastMessage(MSG_NO_SELECTED_SERVER);
         else {
             if (mServerSocket == null) {
                 ServerInfo si = mGlobalSettings.getServerInfo(mServer);
                 if (si != null &&  si.getAutoConnection() == true)
                     safeOpenServerSocket();
 
-                if (mServerSocket != null)
+                if (mServerSocket != null) {
                     mServerOutputStream.write(ba);
+                    mServerOutputStream.flush();
+                }
                 else
-                    ToastMessage(MSG_NO_ACTIVE_SERVER_SOCKET);
+                    mGlobalSettings.toastMessage(MSG_NO_ACTIVE_SERVER_SOCKET);
             }
             else
-                ToastMessage(MSG_NO_ACTIVE_SERVER_SOCKET);
+                mGlobalSettings.toastMessage(MSG_NO_ACTIVE_SERVER_SOCKET);
         }
     }
 
@@ -192,7 +185,7 @@ public class ServerSocketThread extends Thread implements Serializable {
             sendServerData(s);
         }
         catch(Exception e) {
-            ToastMessage(MSG_SOCKET_DATA_FAILURE + "\n" + e.getMessage());
+            mGlobalSettings.toastMessage(MSG_SOCKET_DATA_FAILURE + "\n" + e.getMessage());
             safeCloseServerSocket();
         }
     }
@@ -201,7 +194,7 @@ public class ServerSocketThread extends Thread implements Serializable {
         try {
             sendServerData(ba);
         } catch (Exception e) {
-            ToastMessage(MSG_SOCKET_DATA_FAILURE + "\n" + e.getMessage());
+            mGlobalSettings.toastMessage(MSG_SOCKET_DATA_FAILURE + "\n" + e.getMessage());
             safeCloseServerSocket();
         }
     }

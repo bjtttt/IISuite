@@ -60,6 +60,7 @@ public class ServerPackageManager implements Serializable {
     public final static int MESSAGE_INFORMATION_LENGTH = 19;
     public final static int MESSAGE_RESPONSE_LENGTH = 23;
     public final static int MAX_MESSAGE_BODY_LENGTH = 4096;
+    public final static int MAX_MESSAGE_BODY_MARGIN = 64;
 
     private static int mMessageIndex = 0;
 
@@ -211,18 +212,25 @@ public class ServerPackageManager implements Serializable {
         return mpi;
     }
 
-    /*
-    The caller should make sure ba != null
-     */
     public ResponsePackageInfo parseResponsePackage(byte[] ba) {
-        ResponsePackageInfo rpi = new ResponsePackageInfo(ba);
-
-        if (ba == null || ba.length < MESSAGE_RESPONSE_LENGTH) {
+        if(ba == null || ba.length < MESSAGE_RESPONSE_LENGTH) {
+            ResponsePackageInfo rpi = new ResponsePackageInfo(ba);
             rpi.setResponseCheckType(ResponsePackageInfo.ResponseCheckType.ERROR_INVALID);
             return rpi;
         }
 
-        int dataLen = ba.length - MESSAGE_RESPONSE_LENGTH;
+        return parseResponsePackage(ba, ba.length);
+    }
+
+    public ResponsePackageInfo parseResponsePackage(byte[] ba, int actLen) {
+        ResponsePackageInfo rpi = new ResponsePackageInfo(ba);
+
+        if (ba == null || ba.length < MESSAGE_RESPONSE_LENGTH || actLen < MESSAGE_RESPONSE_LENGTH || ba.length < actLen) {
+            rpi.setResponseCheckType(ResponsePackageInfo.ResponseCheckType.ERROR_INVALID);
+            return rpi;
+        }
+
+        int dataLen = actLen - MESSAGE_RESPONSE_LENGTH;
         byte[] baResponse = new byte[dataLen];
 
         int index = (int) ba[0] << 24 | (int) ba[1] << 16 | (int) ba[2] << 8 | (int) ba[3];
@@ -302,8 +310,8 @@ public class ServerPackageManager implements Serializable {
             crc = (byte)(crc ^ ba[i + 22]);
             baResponse[i] = ba[i + 22];
         }
-        if (crc != ba[ba.length - 1]) {
-            mLogService.Log(LogService.LogType.ERROR, "Server Response : CRC ERROR - CALC CRC " + String.valueOf(crc) + " V.S. CRC " + String.valueOf(ba[ba.length - 1]));
+        if (crc != ba[actLen - 1]) {
+            mLogService.Log(LogService.LogType.ERROR, "Server Response : CRC ERROR - CALC CRC " + String.valueOf(crc) + " V.S. CRC " + String.valueOf(ba[actLen - 1]));
             rpi.setResponseCheckType(ResponsePackageInfo.ResponseCheckType.ERROR_CRC);
             return rpi;
         }

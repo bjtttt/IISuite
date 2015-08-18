@@ -1,10 +1,13 @@
 package com.keysight.guozhitao.iisuite.helper;
 
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 
 import com.keysight.guozhitao.iisuite.helper.msgresp.MessagePackageInfo;
 import com.keysight.guozhitao.iisuite.helper.msgresp.ResponsePackageInfo;
 import com.keysight.guozhitao.iisuite.helper.msgresp.ServerPackageManager;
+import com.keysight.guozhitao.iisuite.helper.thread.MainMessageThread;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -198,4 +201,13 @@ public class GlobalSettings implements Serializable {
     public SocketService getSocketService() { return mSocketService; }
 
     public LogService getLogService() { return mLogService; }
+
+    public void toastMessage(String msg) {
+        Message message = new Message();
+        message.what = MainMessageThread.TOAST_MSG;
+        Bundle b = new Bundle();
+        b.putCharSequence(GlobalSettings.KEY_MSG_SHORT, msg);
+        message.setData(b);
+        mGlobalSettings.getMainhandler().sendMessage(message);
+    }
 }
