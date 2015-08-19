@@ -31,7 +31,6 @@ public class ServerSocketReceiveThread extends Thread implements Serializable {
 
     public ServerSocketReceiveThread(GlobalSettings gs) {
         mGlobalSettings = gs;
-
         mReceiverBuffer = new byte[ServerPackageManager.MAX_MESSAGE_BODY_LENGTH + ServerPackageManager.MAX_MESSAGE_BODY_MARGIN];
     }
 

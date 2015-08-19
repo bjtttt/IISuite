@@ -28,6 +28,7 @@ public class ServerSocketThread extends Thread implements Serializable {
     public final static int OPEN_SERVER = 0x00;
     public final static int CLOSE_SERVER = 0x01;
     public final static int SEND_DATA_TO_SERVER = 0x02;
+    public final static int RCV_DATA_FROM_SERVER = 0x03;
 
     public final static String MSG_TRY_TO_CREATE_SERVER_SOCKET = "Try to create the server socket.";
     public final static String MSG_SOCKET_CREATION_OK = "The server socket is created.";
@@ -53,6 +54,8 @@ public class ServerSocketThread extends Thread implements Serializable {
 
     private Socket mServerSocket = null;
     private boolean mInSocketOperation = false;
+
+    private ServerSocketReceiveThread mRcvThread;
 
     public ServerSocketThread(GlobalSettings globalSettings) {
         super();
@@ -84,8 +87,15 @@ public class ServerSocketThread extends Thread implements Serializable {
                     case OPEN_SERVER:
                         mServer = ((CharSequence)msg.getData().get(GlobalSettings.KEY_SERVER)).toString();
                         safeOpenServerSocket();
+                        if(isServerSocketAvailable()){
+                            mRcvThread = new ServerSocketReceiveThread(mGlobalSettings);
+                            mRcvThread.setSocket(mServerSocket);
+                            mRcvThread.start();
+                        }
                         break;
                     case CLOSE_SERVER:
+                        if(mRcvThread != null)
+                            mRcvThread.setSocket(null);
                         safeCloseServerSocket();
                         mServer = "";
                         mGlobalSettings.setCurrentServerInfo(-1);
@@ -98,6 +108,8 @@ public class ServerSocketThread extends Thread implements Serializable {
                             safeSendServerData(mpi.getSource());
                         }
                         mInSocketOperation = false;
+                        break;
+                    case RCV_DATA_FROM_SERVER:
                         break;
                 }
                 setInSocketOperation(false);
