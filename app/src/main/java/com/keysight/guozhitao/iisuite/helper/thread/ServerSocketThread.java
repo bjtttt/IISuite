@@ -132,7 +132,6 @@ public class ServerSocketThread extends Thread implements Serializable {
         }
         catch(Exception e) {
             mGlobalSettings.toastMessage(MSG_SOCKET_CREATION_FAILURE + "\n" + e.getMessage());
-
             mServerSocket = null;
         }
     }
