@@ -294,13 +294,13 @@ public class MainActivity
                 break;
             case GlobalSettings.TOAST_MSG: {
                 String msgString = msg.getData().getCharSequence(GlobalSettings.KEY_MSG_SHORT).toString();
-                Toast.makeText(getApplicationContext(), msgString, Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, msgString, Toast.LENGTH_LONG).show();
                 break;
             }
             case GlobalSettings.PROGRESS_DIALOG_SHOW: {
                 String title = msg.getData().getCharSequence(GlobalSettings.KEY_TITLE).toString();
                 String msgString = msg.getData().getCharSequence(GlobalSettings.KEY_MSG_SHORT).toString();
-                mProgressDialog = ProgressDialog.show(getApplicationContext(), title, msgString);
+                mProgressDialog = ProgressDialog.show(MainActivity.this, title, msgString);
                 break;
             }
             case GlobalSettings.PROGRESS_DIALOG_HIDE:

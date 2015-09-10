@@ -141,7 +141,7 @@ public class GlobalSettings implements Serializable {
     public ServerInfo getCurrentServerInfo() { return mCurrentServerInfo; }
 
     public void setCurrentServerInfo(int i) {
-        if(i < -1 || i >= mServerInfoList.size())
+        if(i <= -1 || i >= mServerInfoList.size())
             mCurrentServerInfo = null;
         else
             mCurrentServerInfo = mServerInfoList.get(i);

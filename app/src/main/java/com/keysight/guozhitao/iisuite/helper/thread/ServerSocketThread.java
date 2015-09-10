@@ -118,6 +118,7 @@ public class ServerSocketThread extends Thread implements Serializable {
             mServerSocket = new Socket(mServer, GlobalSettings.SERVER_SOCKET_PORT);
             mServerOutputStream = mServerSocket.getOutputStream();
             mGlobalSettings.setCurrentServerInfo(mServer);
+            mGlobalSettings.toastMessage(MSG_SOCKET_CREATION_OK);
         }
         catch(Exception e) {
             mGlobalSettings.toastMessage(MSG_SOCKET_CREATION_FAILURE + "\n" + e.getMessage());
@@ -132,6 +133,7 @@ public class ServerSocketThread extends Thread implements Serializable {
             if(!mServerSocket.isClosed()) {
                 mServerOutputStream.close();
                 mServerSocket.close();
+                mGlobalSettings.toastMessage(MSG_SOCKET_CLOSE_OK);
             }
         }
         catch(Exception e) {

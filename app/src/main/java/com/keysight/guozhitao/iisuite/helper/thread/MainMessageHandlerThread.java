@@ -2,6 +2,7 @@ package com.keysight.guozhitao.iisuite.helper.thread;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -60,7 +61,37 @@ public class MainMessageHandlerThread extends HandlerThread implements
 
     @Override
     public boolean handleMessage(Message msg) {
-        callback.sendMessage(msg);
+        switch (msg.what) {
+            default:
+                break;
+            case GlobalSettings.TOAST_MSG: {
+                String msgString = msg.getData().getCharSequence(GlobalSettings.KEY_MSG_SHORT).toString();
+                Message message = new Message();
+                message.what = TOAST_MSG;
+                Bundle b = new Bundle();
+                b.putCharSequence(GlobalSettings.KEY_MSG_SHORT, msgString);
+                message.setData(b);
+                callback.sendMessage(message);
+                break;
+            }
+            case GlobalSettings.PROGRESS_DIALOG_SHOW: {
+                String title = msg.getData().getCharSequence(GlobalSettings.KEY_TITLE).toString();
+                String msgString = msg.getData().getCharSequence(GlobalSettings.KEY_MSG_SHORT).toString();
+                Message message = new Message();
+                message.what = PROGRESS_DIALOG_SHOW;
+                Bundle b = new Bundle();
+                b.putCharSequence(GlobalSettings.KEY_TITLE, title);
+                b.putCharSequence(GlobalSettings.KEY_MSG_SHORT, msgString);
+                message.setData(b);
+                callback.sendMessage(message);
+                break;
+            }
+            case GlobalSettings.PROGRESS_DIALOG_HIDE:
+                Message message = new Message();
+                message.what = PROGRESS_DIALOG_HIDE;
+                callback.sendMessage(message);
+                break;
+        }
         return true;
     }
 }
