@@ -2,9 +2,14 @@ package com.keysight.guozhitao.iisuite.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -16,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
+import android.widget.Toast;
 
 import com.keysight.guozhitao.iisuite.R;
 import com.keysight.guozhitao.iisuite.activity.settings.InstrumentSettingsFragment;
@@ -27,8 +33,9 @@ import com.keysight.guozhitao.iisuite.helper.InstrumentInfo;
 import com.keysight.guozhitao.iisuite.helper.ServerInfo;
 import com.keysight.guozhitao.iisuite.helper.GlobalSettings;
 import com.keysight.guozhitao.iisuite.helper.SocketService;
-import com.keysight.guozhitao.iisuite.helper.thread.MainMessageThread;
+import com.keysight.guozhitao.iisuite.helper.thread.MainMessageHandlerThread;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +43,7 @@ public class MainActivity
         extends
         ActionBarActivity
         implements
+        Handler.Callback,
         NavigationDrawerFragment.NavigationDrawerCallbacks,
         SCPIFragment.OnFragmentInteractionListener,
         SimulatorFragment.OnFragmentInteractionListener,
@@ -61,7 +69,7 @@ public class MainActivity
     public final int TAB_LOG = 4;
 
     public final String mInstrDBName = "iis_instr";
-    public final String[] mInstrDBColNames = new String[] {
+    public final String[] mInstrDBColNames = new String[]{
             "connection",
             "timeout",
             "idn",
@@ -77,7 +85,7 @@ public class MainActivity
     public final int DB_INSTR_COL_LOCKED = 5;
 
     public final String mServerDBName = "iis_server";
-    public final String[] mServerDBColNames = new String[] {
+    public final String[] mServerDBColNames = new String[]{
             "server",
             "timeout",
             "autoconn"
@@ -103,7 +111,12 @@ public class MainActivity
     private DBService mDBService;
     private GlobalSettings mGlobalSettings;
 
-    private MainMessageThread mMainMsgThread;
+    //private MainMessageThread mMainMsgThread;
+
+    private MainMessageHandlerThread mMainMsgHandlerThread;
+    private Handler mMainMsgHandler;
+    private String mMainMsgHandlerThreadName = "MainMessageHandlerThread";
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,12 +139,12 @@ public class MainActivity
             ii.setLocked(c.getInt(c.getColumnIndex(mInstrDBColNames[DB_INSTR_COL_LOCKED])) == 1);
             mGlobalSettings.getInstrumentInfoList().add(ii);
 
-            if(ii.getConnection().trim().compareToIgnoreCase("localhost") == 0)
+            if (ii.getConnection().trim().compareToIgnoreCase("localhost") == 0)
                 bFindLocal = true;
 
             c.moveToNext();
         }
-        if(bFindLocal == false) {
+        if (bFindLocal == false) {
             InstrumentInfo ii = new InstrumentInfo();
             ii.setConnection("localhost");
             mGlobalSettings.getInstrumentInfoList().add(0, ii);
@@ -148,12 +161,12 @@ public class MainActivity
             si.setAutoConnection(c.getInt(c.getColumnIndex(mServerDBColNames[DB_SERVER_COL_AUTO_CONN])) == 1);
             mGlobalSettings.getServerInfoList().add(si);
 
-            if(si.getServer().compareToIgnoreCase("localhost") == 0)
+            if (si.getServer().compareToIgnoreCase("localhost") == 0)
                 bFindLocal = true;
 
             c.moveToNext();
         }
-        if(bFindLocal == false) {
+        if (bFindLocal == false) {
             ServerInfo si = new ServerInfo();
             si.setServer("localhost");
             mGlobalSettings.getServerInfoList().add(0, si);
@@ -171,8 +184,10 @@ public class MainActivity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
-        mMainMsgThread = new MainMessageThread(mGlobalSettings, this);
-        mMainMsgThread.start();
+        //mMainMsgThread = new MainMessageThread(mGlobalSettings, MainActivity.this);
+        //mMainMsgThread.start();
+
+        mMainMsgHandler = new Handler(this);
     }
 
     @Override
@@ -252,6 +267,48 @@ public class MainActivity
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        mMainMsgHandlerThread = new MainMessageHandlerThread(mGlobalSettings, this, mMainMsgHandlerThreadName);
+        //mGlobalSettings.setMainHandler(mMainMsgHandlerThread.getHandler());
+        mMainMsgHandlerThread.setCallback(mMainMsgHandler);
+        mMainMsgHandlerThread.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mMainMsgHandlerThread.setCallback(null);
+        mGlobalSettings.setMainHandler(null);
+        mMainMsgHandlerThread.quit();
+        mMainMsgHandlerThread = null;
+    }
+
+    @Override
+    public boolean handleMessage(Message msg) {
+        switch (msg.what) {
+            default:
+                break;
+            case GlobalSettings.TOAST_MSG: {
+                String msgString = msg.getData().getCharSequence(GlobalSettings.KEY_MSG_SHORT).toString();
+                Toast.makeText(getApplicationContext(), msgString, Toast.LENGTH_LONG).show();
+                break;
+            }
+            case GlobalSettings.PROGRESS_DIALOG_SHOW: {
+                String title = msg.getData().getCharSequence(GlobalSettings.KEY_TITLE).toString();
+                String msgString = msg.getData().getCharSequence(GlobalSettings.KEY_MSG_SHORT).toString();
+                mProgressDialog = ProgressDialog.show(getApplicationContext(), title, msgString);
+                break;
+            }
+            case GlobalSettings.PROGRESS_DIALOG_HIDE:
+                mProgressDialog.dismiss();
+                break;
+        }
+        return true;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -272,25 +329,23 @@ public class MainActivity
         //MenuItem itemDisconnectInstrument = (MenuItem) findViewById(R.id.action_disconnect_instrument);
         //MenuItem itemConnectServer = (MenuItem) findViewById(R.id.action_connect_server);
         //MenuItem itemDisconnectServer = (MenuItem) findViewById(R.id.action_disconnect_server);
-        if(mInstrumentConnected) {
+        if (mInstrumentConnected) {
             menu.getItem(MENU_ITEM_CONNECT_INSTRUMENT).setEnabled(false);
             menu.getItem(MENU_ITEM_DISCONNECT_INSTRUMENT).setEnabled(true);
             //itemConnectInstrument.setEnabled(false);
             //itemDisconnectInstrument.setEnabled(true);
-        }
-        else {
+        } else {
             menu.getItem(MENU_ITEM_CONNECT_INSTRUMENT).setEnabled(true);
             menu.getItem(MENU_ITEM_DISCONNECT_INSTRUMENT).setEnabled(false);
             //itemConnectInstrument.setEnabled(true);
             //itemDisconnectInstrument.setEnabled(false);
         }
-        if(mServerConnected) {
+        if (mServerConnected) {
             menu.getItem(MENU_ITEM_CONNECT_SERVER).setEnabled(false);
             menu.getItem(MENU_ITEM_DISCONNECT_SERVER).setEnabled(true);
             //itemConnectServer.setEnabled(false);
             //itemDisconnectServer.setEnabled(true);
-        }
-        else {
+        } else {
             menu.getItem(MENU_ITEM_CONNECT_SERVER).setEnabled(true);
             menu.getItem(MENU_ITEM_DISCONNECT_SERVER).setEnabled(false);
             //itemConnectServer.setEnabled(true);
@@ -312,13 +367,13 @@ public class MainActivity
         //}
         if (id == R.id.action_connect_instrument) {
             return true;
-        } else if(id == R.id.action_disconnect_instrument) {
+        } else if (id == R.id.action_disconnect_instrument) {
             return true;
-        } else if(id == R.id.action_connect_server) {
+        } else if (id == R.id.action_connect_server) {
             return true;
-        } else if(id == R.id.action_disconnect_server) {
+        } else if (id == R.id.action_disconnect_server) {
             return true;
-        } else if(id == R.id.action_exit) {
+        } else if (id == R.id.action_exit) {
             AlertDialog.Builder ab = new AlertDialog.Builder(this);
             //ab.setTitle(R.string.dialog_exit).setIcon(R.drawable.question).setMessage((R.string.dialog_exit_msg))
             ab.setTitle(R.string.dialog_exit).setMessage((R.string.dialog_exit_msg))
@@ -342,7 +397,7 @@ public class MainActivity
     }
 
 
-    public void onFragmentInteraction(Uri uri){
+    public void onFragmentInteraction(Uri uri) {
 
     }
 
@@ -385,5 +440,4 @@ public class MainActivity
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
     }
-
 }

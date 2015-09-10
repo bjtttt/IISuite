@@ -4,10 +4,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import com.keysight.guozhitao.iisuite.activity.MainActivity;
 import com.keysight.guozhitao.iisuite.helper.msgresp.MessagePackageInfo;
 import com.keysight.guozhitao.iisuite.helper.msgresp.ResponsePackageInfo;
 import com.keysight.guozhitao.iisuite.helper.msgresp.ServerPackageManager;
-import com.keysight.guozhitao.iisuite.helper.thread.MainMessageThread;
+//import com.keysight.guozhitao.iisuite.helper.thread.MainMessageThread;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,6 +18,11 @@ import java.util.ArrayList;
  */
 public class GlobalSettings implements Serializable {
 
+    public final static int TOAST_MSG = 0;
+    public final static int PROGRESS_DIALOG_SHOW = 1;
+    public final static int PROGRESS_DIALOG_HIDE = 2;
+
+    public final static String KEY_TITLE = "TITLE";
     public final static String KEY_MSG_SHORT = "MSG";
     public final static String KEY_SERVER = "SERVER";
     public final static String KEY_UTF8 = "UTF-8";
@@ -65,7 +71,7 @@ public class GlobalSettings implements Serializable {
         mMainHandler = h;
     }
 
-    public Handler getMainhandler() {
+    public Handler getMainHandler() {
         return mMainHandler;
     }
 
@@ -204,10 +210,26 @@ public class GlobalSettings implements Serializable {
 
     public void toastMessage(String msg) {
         Message message = new Message();
-        message.what = MainMessageThread.TOAST_MSG;
+        message.what = TOAST_MSG;
         Bundle b = new Bundle();
         b.putCharSequence(GlobalSettings.KEY_MSG_SHORT, msg);
         message.setData(b);
-        mGlobalSettings.getMainhandler().sendMessage(message);
+        mGlobalSettings.getMainHandler().sendMessage(message);
+    }
+
+    public void showProgressDialog(String title, String msg) {
+        Message message = new Message();
+        message.what = PROGRESS_DIALOG_SHOW;
+        Bundle b = new Bundle();
+        b.putCharSequence(GlobalSettings.KEY_TITLE, title);
+        b.putCharSequence(GlobalSettings.KEY_MSG_SHORT, msg);
+        message.setData(b);
+        mGlobalSettings.getMainHandler().sendMessage(message);
+    }
+
+    public void hideProgressDialog() {
+        Message message = new Message();
+        message.what = PROGRESS_DIALOG_HIDE;
+        mGlobalSettings.getMainHandler().sendMessage(message);
     }
 }

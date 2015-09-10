@@ -1,5 +1,6 @@
 package com.keysight.guozhitao.iisuite.helper.thread;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -53,7 +54,6 @@ public class ServerSocketThread extends Thread implements Serializable {
     private OutputStream mServerOutputStream;
 
     private Socket mServerSocket = null;
-    private boolean mInSocketOperation = false;
 
     private ServerSocketReceiveThread mRcvThread;
 
@@ -66,53 +66,42 @@ public class ServerSocketThread extends Thread implements Serializable {
         return mHandler;
     }
 
-    public synchronized void setInSocketOperation(boolean inSocketOperation) {
-        mInSocketOperation = inSocketOperation;
-    }
-
-    public synchronized boolean getInSocketOperation() {
-        return mInSocketOperation;
-    }
-
     @Override
     public void run() {
         Looper.prepare();
         mHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                setInSocketOperation(true);
                 switch(msg.what) {
                     default:
                         break;
                     case OPEN_SERVER:
                         mServer = ((CharSequence)msg.getData().get(GlobalSettings.KEY_SERVER)).toString();
+                        mGlobalSettings.showProgressDialog(mServer, "Connecting...");
                         safeOpenServerSocket();
-                        if(isServerSocketAvailable()){
-                            mRcvThread = new ServerSocketReceiveThread(mGlobalSettings);
-                            mRcvThread.setSocket(mServerSocket);
-                            mRcvThread.start();
-                        }
+                        mGlobalSettings.hideProgressDialog();
                         break;
                     case CLOSE_SERVER:
-                        if(mRcvThread != null)
-                            mRcvThread.setSocket(null);
+                        mGlobalSettings.showProgressDialog(mServer, "Disconnecting...");
                         safeCloseServerSocket();
                         mServer = "";
                         mGlobalSettings.setCurrentServerInfo(-1);
+                        mGlobalSettings.hideProgressDialog();
                         break;
                     case SEND_DATA_TO_SERVER:
+                        mGlobalSettings.showProgressDialog(mServer, "Sending data...");
                         MessagePackageInfo.MessagePackageType t = (MessagePackageInfo.MessagePackageType)msg.getData().get("TYPE");
                         String s = ((CharSequence)msg.getData().get(GlobalSettings.KEY_MSG_SHORT)).toString();
                         ArrayList<MessagePackageInfo> msgArray = mGlobalSettings.getServerPackageManager().composeMsgs(t, s);
                         for(MessagePackageInfo mpi : msgArray) {
                             safeSendServerData(mpi.getSource());
                         }
-                        mInSocketOperation = false;
+                        mGlobalSettings.hideProgressDialog();
+                        //mInSocketOperation = false;
                         break;
                     case RCV_DATA_FROM_SERVER:
                         break;
                 }
-                setInSocketOperation(false);
             }
         };
         Looper.loop();

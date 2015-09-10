@@ -289,6 +289,7 @@ public class ServerSettingsFragment extends Fragment {
                 mGlobalSettings.getLogService().Log(LogService.LogType.ERROR, "Unknown server context menu selection - 0");
                 break;
             case 0:
+                /*
                 if(mGlobalSettings.getSocketService().getServerSendThread().getInSocketOperation() == true) {
                     AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
                     ab.setTitle(item.getTitle().toString()).setMessage("Cannot interrupt a talk to the server.")
@@ -299,7 +300,7 @@ public class ServerSettingsFragment extends Fragment {
                             })
                             .create().show();
                 }
-                else {
+                else*/ {
                     if (mGlobalSettings.getCurrentServerInfo() != null) {
                         Message msg = new Message();
                         msg.what = ServerSocketThread.CLOSE_SERVER;
